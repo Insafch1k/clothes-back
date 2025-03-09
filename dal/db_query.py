@@ -174,16 +174,16 @@ class ManageQuery:
                 binary_photo = ManageQuery.photo_in_binary(photo)
                 if id_user and id_category and binary_photo:
                     query = """
-                            INSERT INTO photo_users (id_user, photo, id_category, is_out)
+                            INSERT INTO photo_clothes (id_user, photo, id_category, is_out)
                             VALUES (%s, %s, %s, FALSE)
                     """
                     ManageQuery._execute_query(query, (id_user, binary_photo, id_category))
-                    logging.info(f"Photo added successfully for user {user_name}")
+                    logging.info(f"Photo clothes added successfully for user {user_name}")
                     ret = True
                 else:
                     logging.error("Invalid user id, category id, or photo binary")
             except Error as e:
                 logging.error(f"Error add photo user {str(e)}")
         else:
-            logging.warning("Это фото уже есть в базе данных у этого человека")
+            logging.warning("Это фото одежды уже есть в базе данных у этого человека")
         return ret
