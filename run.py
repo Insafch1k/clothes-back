@@ -1,18 +1,20 @@
 import psycopg2
-from db_query import ManageQuery
-from db_connection import DBConnection
+#from db_query import ManageQuery
+from dal.db_connection import DBConnection
 from flask import Flask
 import os
 import logging
+from bl.background_removal.background_routes import background_bp
 
-# app = Flask(__name__)
+app = Flask(__name__)
 # app.config.from_object(__name__)
 # app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 #
 # app.config.update(dict(DATABASE=os.path.join(app.root_path, os.getenv("DBNAME"))))
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
+#logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
+app.register_blueprint(background_bp, url_prefix="/background")
 
 def test_add_photo_user():
     with open("1.jpg", "rb") as file:
@@ -25,6 +27,6 @@ def test_add_photo_user():
         # m.delete_photo_user(img)
 
 
-test_add_photo_user()
-# if __name__ == "__main__":
-#     app.run(debug=True)
+#test_add_photo_user()
+if __name__ == "__main__":
+     app.run(debug=True)

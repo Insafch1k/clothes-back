@@ -1,12 +1,10 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 import os
-from background_removal import remove_background
+from bl.background_removal.background_removal import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 
 background_bp = Blueprint("background", __name__)
-UPLOAD_FOLDER = "uploads"
-PROCESSED_FOLDER = "processed_images"
 
-
+# Если папки ещё не созданы, можно проверить (но в background_removal.py они уже создаются)
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 if not os.path.exists(PROCESSED_FOLDER):
@@ -24,7 +22,7 @@ def upload_file():
     if file.filename == "":
         return jsonify({"error": "Файл не выбран!"})
 
-    # Сохраняем загруженный файл
+    # Сохраняем загруженный файл в папку uploads внутри bl/background_removal
     input_path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(input_path)
 
@@ -32,7 +30,7 @@ def upload_file():
     output_filename = remove_background(input_path)
 
     if output_filename:
-        return jsonify({"message": "Фон удалён!", "file_url": f"/processed/{output_filename}"})
+        return jsonify({"message": "Фон удалён!", "file_url": f"/background/processed/{output_filename}"})
     else:
         return jsonify({"error": "Ошибка обработки изображения"})
 
