@@ -1,0 +1,199 @@
+Index: bl/dress_a_person/find_pose.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import cv2\r\nimport mediapipe as mp\r\n\r\n# Инициализация MediaPipe Pose\r\nmp_pose = mp.solutions.pose\r\npose = mp_pose.Pose(static_image_mode=True)\r\n\r\n# Загрузка изображения\r\nimage_path = 'person.jpg'  # Убедитесь, что путь правильный\r\nimage = cv2.imread(image_path)\r\n\r\n# Проверка, загружено ли изображение\r\nif image is None:\r\n    print(f\"Ошибка: Не удалось загрузить изображение по пути: {image_path}\")\r\nelse:\r\n    # Преобразование изображения в RGB\r\n    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)\r\n\r\n    # Обработка изображения с помощью MediaPipe Pose\r\n    results = pose.process(image_rgb)\r\n\r\n    # Проверка результатов\r\n    if results.pose_landmarks:\r\n        # Копия изображения для рисования\r\n        annotated_image = image.copy()\r\n\r\n        # Инициализация утилит для рисования\r\n        mp_drawing = mp.solutions.drawing_utils\r\n\r\n        # Рисование ключевых точек и соединений\r\n        mp_drawing.draw_landmarks(\r\n            annotated_image,\r\n            results.pose_landmarks,\r\n            mp_pose.POSE_CONNECTIONS,\r\n            landmark_drawing_spec=mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),  # Зеленый цвет для точек\r\n            connection_drawing_spec=mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2)  # Красный цвет для линий\r\n        )\r\n\r\n        # Сохранение результата\r\n        cv2.imwrite('annotated_image.jpg', annotated_image)\r\n\r\n        # Показ результата\r\n        cv2.imshow('Annotated Image', annotated_image)\r\n        cv2.waitKey(0)\r\n        cv2.destroyAllWindows()\r\n    else:\r\n        print(\"Поза не обнаружена. Убедитесь, что на изображении видно тело человека.\")
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/bl/dress_a_person/find_pose.py b/bl/dress_a_person/find_pose.py
+--- a/bl/dress_a_person/find_pose.py	(revision 25ed1db148d5a20bf3cd40ab38d5bec28adf806d)
++++ b/bl/dress_a_person/find_pose.py	(date 1741533308427)
+@@ -1,47 +1,151 @@
+ import cv2
++import numpy as np
+ import mediapipe as mp
+ 
+-# Инициализация MediaPipe Pose
+-mp_pose = mp.solutions.pose
+-pose = mp_pose.Pose(static_image_mode=True)
++
++class ClothesFitting:
++    def __init__(self, person_image_path, clothes_image_path):
++        """
++        Инициализация класса.
++        :param person_image_path: Путь к изображению человека.
++        :param clothes_image_path: Путь к изображению одежды.
++        """
++        # Загрузка изображений
++        self.person_image = cv2.imread(person_image_path)
++        self.clothes_image = cv2.imread(clothes_image_path, cv2.IMREAD_UNCHANGED)
++
++        # Проверка загрузки изображений
++        if self.person_image is None:
++            raise ValueError(f"Не удалось загрузить изображение человека по пути: {person_image_path}")
++        if self.clothes_image is None:
++            raise ValueError(f"Не удалось загрузить изображение одежды по пути: {clothes_image_path}")
++
++        # Инициализация MediaPipe Pose
++        self.mp_pose = mp.solutions.pose
++        self.pose = self.mp_pose.Pose(static_image_mode=True)
+ 
+-# Загрузка изображения
+-image_path = 'person.jpg'  # Убедитесь, что путь правильный
+-image = cv2.imread(image_path)
++        # Поле для хранения результата
++        self.annotated_image = None
+ 
+-# Проверка, загружено ли изображение
+-if image is None:
+-    print(f"Ошибка: Не удалось загрузить изображение по пути: {image_path}")
+-else:
+-    # Преобразование изображения в RGB
+-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
++    def detect_pose(self):
++        """
++        Обнаружение позы человека на изображении.
++        :return: Ключевые точки позы (landmarks).
++        """
++        # Преобразование изображения в RGB
++        image_rgb = cv2.cvtColor(self.person_image, cv2.COLOR_BGR2RGB)
+ 
+-    # Обработка изображения с помощью MediaPipe Pose
+-    results = pose.process(image_rgb)
++        # Обработка изображения с помощью MediaPipe Pose
++        results = self.pose.process(image_rgb)
+ 
+-    # Проверка результатов
+-    if results.pose_landmarks:
+-        # Копия изображения для рисования
+-        annotated_image = image.copy()
++        if results.pose_landmarks:
++            return results.pose_landmarks.landmark
++        else:
++            raise ValueError("Поза не обнаружена. Убедитесь, что на изображении видно тело человека.")
++
++    def calculate_clothes_size(self, landmarks):
++        """
++        Расчет размеров одежды на основе ключевых точек.
++        :param landmarks: Ключевые точки позы.
++        :return: Ширина и высота одежды, начальные координаты.
++        """
++        # Координаты плеч и бедер
++        left_shoulder = landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER]
++        right_shoulder = landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER]
++        left_hip = landmarks[self.mp_pose.PoseLandmark.LEFT_HIP]
++
++        # Преобразование нормализованных координат в пиксели
++        height, width, _ = self.person_image.shape
++        left_shoulder_x = int(left_shoulder.x * width)
++        left_shoulder_y = int(left_shoulder.y * height)
++        right_shoulder_x = int(right_shoulder.x * width)
++        left_hip_y = int(left_hip.y * height)
++
++        # Расчет размеров одежды
++        clothes_width = abs(right_shoulder_x - left_shoulder_x) * 21 / 10  # Увеличение ширины в 2 раза
++        clothes_height = abs(left_hip_y - left_shoulder_y) * 17 / 10  # Увеличение высоты в 2 раза
++
++        # Начальные координаты для наложения
++        start_x = min(left_shoulder_x, right_shoulder_x) - int(clothes_width * 0.28)  # Смещение для центрирования
++        start_y = left_shoulder_y - int(clothes_height * 0.26)  # Смещение для центрирования
+ 
+-        # Инициализация утилит для рисования
+-        mp_drawing = mp.solutions.drawing_utils
++        return clothes_width, clothes_height, start_x, start_y
+ 
+-        # Рисование ключевых точек и соединений
+-        mp_drawing.draw_landmarks(
+-            annotated_image,
+-            results.pose_landmarks,
+-            mp_pose.POSE_CONNECTIONS,
+-            landmark_drawing_spec=mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),  # Зеленый цвет для точек
+-            connection_drawing_spec=mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2)  # Красный цвет для линий
+-        )
++    def resize_clothes(self, clothes_width, clothes_height):
++        """
++        Масштабирование изображения одежды.
++        :param clothes_width: Ширина одежды.
++        :param clothes_height: Высота одежды.
++        :return: Масштабированное изображение одежды.
++        """
++        if clothes_width > 0 and clothes_height > 0:
++            return cv2.resize(self.clothes_image, (int(clothes_width), int(clothes_height)))
++        else:
++            raise ValueError("Некорректные размеры одежды.")
+ 
+-        # Сохранение результата
+-        cv2.imwrite('annotated_image.jpg', annotated_image)
++    def overlay_clothes(self, clothes_resized, start_x, start_y):
++        """
++        Наложение одежды на изображение человека.
++        :param clothes_resized: Масштабированное изображение одежды.
++        :param start_x: Начальная координата X для наложения.
++        :param start_y: Начальная координата Y для наложения.
++        """
++        # Создание копии изображения для наложения
++        self.annotated_image = self.person_image.copy()
+ 
+-        # Показ результата
+-        cv2.imshow('Annotated Image', annotated_image)
+-        cv2.waitKey(0)
+-        cv2.destroyAllWindows()
+-    else:
+-        print("Поза не обнаружена. Убедитесь, что на изображении видно тело человека.")
+\ No newline at end of file
++        # Наложение одежды
++        for c in range(3):  # RGB-каналы
++            self.annotated_image[start_y:start_y + clothes_resized.shape[0],
++            start_x:start_x + clothes_resized.shape[1], c] = \
++                clothes_resized[:, :, c] * (clothes_resized[:, :, 3] / 255.0) + \
++                self.annotated_image[start_y:start_y + clothes_resized.shape[0],
++                start_x:start_x + clothes_resized.shape[1], c] * (1.0 - clothes_resized[:, :, 3] / 255.0)
++
++    def save_result(self, output_path):
++        """
++        Сохранение результата.
++        :param output_path: Путь для сохранения результата.
++        """
++        if self.annotated_image is not None:
++            cv2.imwrite(output_path, self.annotated_image)
++        else:
++            raise ValueError("Результат не найден. Сначала выполните наложение одежды.")
++
++    def show_result(self):
++        """
++        Отображение результата.
++        """
++        if self.annotated_image is not None:
++            cv2.imshow('Result', self.annotated_image)
++            cv2.waitKey(0)
++            cv2.destroyAllWindows()
++        else:
++            raise ValueError("Результат не найден. Сначала выполните наложение одежды.")
++
++
++# Пример использования
++if __name__ == "__main__":
++    try:
++        # Инициализация класса
++        clothes_fitting = ClothesFitting('person3.png', 'tshirt.png')
++
++        # Обнаружение позы
++        landmarks = clothes_fitting.detect_pose()
++
++        # Расчет размеров одежды
++        clothes_width, clothes_height, start_x, start_y = clothes_fitting.calculate_clothes_size(landmarks)
++
++        # Масштабирование одежды
++        clothes_resized = clothes_fitting.resize_clothes(clothes_width, clothes_height)
++
++        # Наложение одежды
++        clothes_fitting.overlay_clothes(clothes_resized, start_x, start_y)
++
++        # Сохранение результата
++        clothes_fitting.save_result('output.png')
++
++        # Отображение результата
++        clothes_fitting.show_result()
++
++    except Exception as e:
++        print(f"Произошла ошибка: {e}")
