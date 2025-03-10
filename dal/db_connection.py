@@ -20,7 +20,7 @@ class DBConnection:
                 host=os.getenv('HOST'),
                 port=os.getenv('PORT')
             )
-            logging.info("Database connection established successfully")
+            # logging.info("Database connection established successfully")
             return connection
         except Error as e:
             logging.error(f"Error connecting to the database: {str(e)}")
