@@ -4,7 +4,7 @@ from bl.background_removal.background_removal import remove_background, UPLOAD_F
 
 background_bp = Blueprint("background", __name__)
 
-# Если папки ещё не созданы, можно проверить (но в background_removal.py они уже создаются)
+# Если папки ещё не созданы, можно проверить
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 if not os.path.exists(PROCESSED_FOLDER):
