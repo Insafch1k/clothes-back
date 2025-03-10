@@ -1,10 +1,7 @@
-import psycopg2
 #from db_query import ManageQuery
-from dal.db_connection import DBConnection
 from flask import Flask
-import os
 import logging
-from bl.background_removal.background_routes import background_bp
+from routes.background_routes import background_bp
 
 app = Flask(__name__)
 # app.config.from_object(__name__)
