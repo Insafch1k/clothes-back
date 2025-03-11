@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from bl.background_removal.background_removal import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
+from dal.db_query import ManageQuery
+from dotenv import load_dotenv, find_dotenv
 
 background_bp = Blueprint("background", __name__)
 
@@ -30,9 +32,14 @@ def upload_file():
     output_filename = remove_background(input_path)
 
     if output_filename:
-        return jsonify({"message": "Фон удалён!", "file_url": f"/background/processed/{output_filename}"})
+        success = ManageQuery.add_photo_user(user_name="test_name", photo=open(input_path, "rb").read(), category="full")
+        if success:
+            return jsonify({"message": "Фон удалён!", "file_url": f"/background/processed/{output_filename}"})
+        else:
+            return jsonify({"error": "Ошибка обработки изображения"})
     else:
         return jsonify({"error": "Ошибка обработки изображения"})
+
 
 @background_bp.route("/processed/<filename>", methods=["GET"])
 def get_processed_image(filename):
