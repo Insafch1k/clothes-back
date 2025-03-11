@@ -120,7 +120,7 @@ class ManageQuery:
         return ret
 
     @staticmethod
-    def add_photo_user(user_name, photo, category):  # Добавляет фото человека в базу данных
+    def add_photo_user(user_name, photo, category, is_cut=True):  # Добавляет фото человека в базу данных
         ret = False
         # if ManageQuery.category_photos_not_exists(category):  # Проверка существования категории
         #     logging.error(f"Category '{category}' does not exist in category_photos")
@@ -134,10 +134,10 @@ class ManageQuery:
                 binary_photo = ManageQuery.photo_in_binary(photo)
                 if ManageQuery.check_args_add_photo(id_user, id_category, binary_photo, user_name, category):
                     query = """
-                            INSERT INTO photo_users (id_user, photo, id_category, is_out)
-                            VALUES (%s, %s, %s, FALSE)
+                            INSERT INTO photo_users (id_user, photo, id_category, is_cut)
+                            VALUES (%s, %s, %s, %s)
                     """
-                    ManageQuery._execute_query(query, (id_user, binary_photo, id_category))
+                    ManageQuery._execute_query(query, (id_user, binary_photo, id_category, is_cut))
                     logging.info(f"Photo added successfully for user {user_name}")
                     ret = True
                 else:
@@ -222,7 +222,7 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def add_photo_clothes(user_name, photo, category):  # Добавляет фото одежды в базу данных
+    def add_photo_clothes(user_name, photo, category, is_cut=True):  # Добавляет фото одежды в базу данных
         ret = False
         # if ManageQuery.category_clothes_not_exists(category):  # Проверка существования категории
         #     logging.error(f"Category '{category}' does not exist in category_clothes")
@@ -236,10 +236,10 @@ class ManageQuery:
                 binary_photo = ManageQuery.photo_in_binary(photo)
                 if ManageQuery.check_args_add_photo(id_user, id_category, binary_photo, user_name, category):
                     query = """
-                            INSERT INTO photo_clothes (id_user, photo, id_category, is_out)
-                            VALUES (%s, %s, %s, FALSE)
+                            INSERT INTO photo_clothes (id_user, photo, id_category, is_cut)
+                            VALUES (%s, %s, %s, %s)
                     """
-                    ManageQuery._execute_query(query, (id_user, binary_photo, id_category))
+                    ManageQuery._execute_query(query, (id_user, binary_photo, id_category, is_cut))
                     logging.info(f"Photo clothes added successfully for user {user_name}")
                     ret = True
                 else:

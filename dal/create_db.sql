@@ -17,7 +17,7 @@ CREATE TABLE Photo_users (
     id_user INT REFERENCES Users(id_user),
     photo BYTEA,
     id_category INT REFERENCES Category_photos(id_category),
-    is_out BOOLEAN
+    is_cut BOOLEAN
 );
 
 -- Создание таблицы Category_clothes
@@ -32,5 +32,5 @@ CREATE TABLE Photo_clothes (
     id_user INT REFERENCES Users(id_user),
     photo BYTEA,
     id_category INT REFERENCES Category_clothes(id_category),
-    is_out BOOLEAN
+    is_cut BOOLEAN
 );
