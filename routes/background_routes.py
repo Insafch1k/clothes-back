@@ -32,7 +32,7 @@ def upload_file():
     output_filename = remove_background(input_path)
 
     if output_filename:
-        success = ManageQuery.add_photo_user(user_name="test_name", photo=open(input_path, "rb").read(), category="full")
+        success = ManageQuery.add_photo_user(user_name="test_name", photo=open(input_path, "rb").read(), category="full", is_cut=True)
         if success:
             return jsonify({"message": "Фон удалён!", "file_url": f"/background/processed/{output_filename}"})
         else:
