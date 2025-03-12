@@ -5,12 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add join database">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_15_36__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_15_36__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_16_43__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_16_43__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_18_15__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_18_15__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_03_2025_15_23__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_03_2025_15_23__Changes_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_hat/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_pants/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_shoes/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_tshort/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/clothes-back.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/clothes-back.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/background_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/background_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/annotated_image.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/find_pose.py" beforeDir="false" afterPath="$PROJECT_DIR$/bl/dress_a_person/find_pose.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/output.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/output.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/tshirt.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,15 +57,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.find_pose.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.find_pose.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
