@@ -5,22 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add join database">
-      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_hat/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_pants/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_shoes/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bl/dress_a_person/dress_a_tshort/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/clothes-back.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/clothes-back.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_15_36__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_15_36__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_16_43__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_16_43__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_18_15__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_03_2025_18_15__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_03_2025_15_23__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_03_2025_15_23__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/annotated_image.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/find_pose.py" beforeDir="false" afterPath="$PROJECT_DIR$/bl/dress_a_person/find_pose.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/output.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/output.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/person3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/dress_a_person/tshirt.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/background_removal/processed_images/3725379d8d854689af08f9225f4ff061.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/background_removal/uploads/43-1-scaled.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/background_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/background_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +58,35 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
+  <component name="RunManager">
+    <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="clothes-back" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Admin\python.exe" />
+      <option name="SDK_NAME" value="Python 3.11" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.run" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

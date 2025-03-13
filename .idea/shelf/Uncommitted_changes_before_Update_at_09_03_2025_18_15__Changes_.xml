@@ -3,5 +3,7 @@
   <option name="DESCRIPTION" value="Uncommitted changes before Update at 09.03.2025 18:15 [Changes]" />
   <binary>
     <option name="BEFORE_PATH" value="bl/dress_a_person/annotated_image.jpg" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
   </binary>
 </changelist>
