@@ -15,9 +15,9 @@ CREATE TABLE Category_photos (
 CREATE TABLE Photo_users (
     id_photo SERIAL PRIMARY KEY,
     id_user INT REFERENCES Users(id_user),
-    photo BYTEA,
+    photo_path TEXT NOT NULL,  -- Путь к файлу или URL
     id_category INT REFERENCES Category_photos(id_category),
-    is_cut BOOLEAN
+    is_out BOOLEAN
 );
 
 -- Создание таблицы Category_clothes
@@ -30,7 +30,7 @@ CREATE TABLE Category_clothes (
 CREATE TABLE Photo_clothes (
     id_clothes SERIAL PRIMARY KEY,
     id_user INT REFERENCES Users(id_user),
-    photo BYTEA,
+    photo_path TEXT NOT NULL,  -- Путь к файлу или URL
     id_category INT REFERENCES Category_clothes(id_category),
-    is_cut BOOLEAN
+    is_out BOOLEAN
 );
