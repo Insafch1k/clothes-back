@@ -3,12 +3,10 @@ from PIL import Image
 import os
 import uuid
 
-# Определяем базовую директорию модуля
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Формируем пути внутри пакета:
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-PROCESSED_FOLDER = os.path.join(BASE_DIR, "processed_images")
+# Определяем пути для загрузки и обработанных файлов внутри директории photo
+BASE_PHOTO_DIR = os.path.join(os.getcwd(), "photo")  # Корневая директория photo
+UPLOAD_FOLDER = os.path.join(BASE_PHOTO_DIR, "uploads")  # Путь для оригинальных изображений
+PROCESSED_FOLDER = os.path.join(BASE_PHOTO_DIR, "processed_images")  # Путь для обработанных изображений
 
 # Создаем папки, если их нет
 if not os.path.exists(UPLOAD_FOLDER):
