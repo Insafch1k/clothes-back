@@ -39,12 +39,12 @@ def upload_file():
 
         if output_filename:
             # Читаем изображение и кодируем в Base64 (если это необходимо для других целей)
-            with open(input_path, "rb") as img_file:
-                image_data = img_file.read()
+            # with open(input_path, "rb") as img_file:
+            #     image_data = img_file.read()
 
             # Сохраняем информацию о фотографии пользователя
             try:
-                success = ManageQuery.add_photo_user(user_name=user_name, photo=image_data, category="full", is_cut=True)
+                success = ManageQuery.add_photo_user(user_name=user_name, photo_path=input_path, category="full", is_cut=True)
                 if success:
                     return jsonify({
                         "message": "Фон удалён!",

@@ -2,8 +2,10 @@
 from flask import Flask
 import logging
 from routes.background_routes import background_bp
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 # app.config.from_object(__name__)
 # app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 #
@@ -13,14 +15,14 @@ app = Flask(__name__)
 
 app.register_blueprint(background_bp, url_prefix="/background")
 
-def test_add_photo_user():
-    with open("1.jpg", "rb") as file:
-        img = file.read()
-        m = ManageQuery()
-        if m.add_photo_user('Dod', img, "Full"):
-            logging.info("Test passed: Photo added successfully")
-        else:
-            logging.error("Test failed: Photo not added")
+# def test_add_photo_user():
+#     with open("1.jpg", "rb") as file:
+#         img = file.read()
+#         m = ManageQuery()
+#         if m.add_photo_user('Dod', img, "Full"):
+#             logging.info("Test passed: Photo added successfully")
+#         else:
+#             logging.error("Test failed: Photo not added")
         # m.delete_photo_user(img)
 
 
