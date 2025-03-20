@@ -28,8 +28,6 @@ class ManageQuery:
 
                     if fetch:
                         result = cursor.fetchall()
-                        # if result and len(result) == 1 and len(result[0]) == 1:  # Если результат содержит одно значение
-                        #     result = result[0][0]  # Вернуть это значение
                         return result  # Иначе вернуть весь результат
 
                     con.commit()
@@ -72,38 +70,10 @@ class ManageQuery:
             logging.error(f"Error get id category_photos {str(e)}")
             return None
 
-    # @staticmethod
-    # def photo_in_binary(photo):  # Переводит фото в бинарный вид
-    #     try:
-    #         binary_photo = psycopg2.Binary(photo)
-    #         return binary_photo
-    #     except Error as e:
-    #         logging.error(f"Error photo in binary {str(e)}")
-    #         return None
-
-    # @staticmethod # Не используется
-    # def category_photos_not_exists(category):  # Проверяет, существует ли данная категория фото в базе данных
-    #     try:
-    #         query = """
-    #                 SELECT EXISTS (
-    #                     SELECT id_category FROM category_photos
-    #                     WHERE category = %s
-    #                 )
-    #         """
-    #         result = ManageQuery._execute_query(query, category, True)
-    #         ret = True
-    #         if result:
-    #             ret = False
-    #         return ret
-    #     except Error as e:
-    #         logging.error(f"Error checking category photo existence: {str(e)}")
-    #         return False
-
     @staticmethod
     def photo_users_not_exist(photo_path,
                               user_name):  # Проверяет, существует ли путь к фото человека в базе данных у этого человека
         try:
-            # binary_photo = ManageQuery.photo_in_binary(photo)
             id_user = ManageQuery.get_id_user(user_name)
             query = """
                     SELECT id_photo FROM photo_users
@@ -131,31 +101,16 @@ class ManageQuery:
             logging.error("Photo path is empty")
         return ret
 
-    # @staticmethod
-    # def save_photo(photo):
-    #     if photo:
-    #         filename = secure_filename(photo.filename)
-    #         timestamp = datetime.now().strftime("%d%m%Y%H%M%S")
-    #         unique_filename = f"{timestamp}_{filename}"
-    #         file_path = os.path.join(os.getenv('FOLDER_PHOTO_PERSON'), unique_filename)
-    #         photo.save(file_path)
-    #         return file_path
-    #     return None
-
     @staticmethod
     def add_photo_user(user_name, photo_path, category="full",
                        is_cut=True):  # Добавляет путь к фото человека в базу данных
         ret = False
-        # if ManageQuery.category_photos_not_exists(category):  # Проверка существования категории
-        #     logging.error(f"Category '{category}' does not exist in category_photos")
-        #     return ret
 
         if ManageQuery.photo_users_not_exist(photo_path,
                                              user_name):  # Проверяет, существует ли путь фото человека в базе данных у этого человека
             try:
                 id_user = ManageQuery.get_id_user(user_name)
                 id_category = ManageQuery.get_id_category_photos(category)
-                # binary_photo = ManageQuery.photo_in_binary(photo)
                 if ManageQuery.check_args_add_photo(id_user, id_category, user_name, category, photo_path):
                     query = """
                             INSERT INTO photo_users (id_user, photo_path, id_category, is_cut)
@@ -177,10 +132,6 @@ class ManageQuery:
         ret = False
         if photo_path:
             try:
-                # binary_photo = ManageQuery.photo_in_binary(photo)
-                # if binary_photo is None:
-                #     logging.error("Delete photo user: failed to convert photo to binary")
-                #     return ret
                 query = """
                         DELETE FROM photo_users
                         WHERE photo_path = %s
@@ -197,7 +148,6 @@ class ManageQuery:
     def photo_clothes_not_exist(photo_path,
                                 user_name):  # Проверяет, существует ли путь фото в базе данных у этого человека
         try:
-            # binary_photo = ManageQuery.photo_in_binary(photo)
             id_user = ManageQuery.get_id_user(user_name)
             query = """
                     SELECT id_clothes FROM photo_clothes
@@ -211,24 +161,6 @@ class ManageQuery:
         except Error as e:
             logging.error(f"Error photo not exist {str(e)}")
             return None
-
-    # @staticmethod  # Не используется
-    # def category_clothes_not_exists(category):  # Проверяет, существует ли данная категория одежды в базе данных
-    #     try:
-    #         query = """
-    #                 SELECT EXISTS (
-    #                     SELECT id_category FROM category_clothes
-    #                     WHERE category = %s
-    #                 )
-    #         """
-    #         result = ManageQuery._execute_query(query, category, True)
-    #         ret = True
-    #         if result:
-    #             ret = False
-    #         return ret
-    #     except Error as e:
-    #         logging.error(f"Error checking category clothes existence: {str(e)}")
-    #         return False
 
     @staticmethod
     def get_id_category_clothes(category):  # Получает id_category фото одежды по названию категории
@@ -248,9 +180,6 @@ class ManageQuery:
     @staticmethod
     def add_photo_clothes(user_name, photo_path, category, is_cut=True):  # Добавляет фото одежды в базу данных
         ret = False
-        # if ManageQuery.category_clothes_not_exists(category):  # Проверка существования категории
-        #     logging.error(f"Category '{category}' does not exist in category_clothes")
-        #     return ret
 
         if ManageQuery.photo_clothes_not_exist(photo_path,
                                                user_name):  # Проверяет, существует ли путь к фото одежды в базе данных у этого человека
@@ -280,10 +209,6 @@ class ManageQuery:
         if photo_path:
 
             try:
-                # binary_photo = ManageQuery.photo_in_binary(photo)
-                # if binary_photo is None:
-                #     logging.error("Delete photo clothes: failed to convert photo to binary")
-                #     return ret
                 query = """
                         DELETE FROM photo_clothes
                         WHERE photo_path = %s
