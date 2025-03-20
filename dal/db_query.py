@@ -32,8 +32,9 @@ class ManageQuery:
 
                     con.commit()
                 except Error as e:
-                    logging.error(f"Error executing query: {str(e)}")
+                    # logging.error(f"Error executing query: {str(e)}")
                     con.rollback()
+                    raise
                 return None  # Явный возврат None, если fetch=False
 
     @staticmethod
@@ -172,6 +173,8 @@ class ManageQuery:
             result = ManageQuery._execute_query(query, category, True)
             if not result:
                 result = None
+            else:
+                result = result[0][0]
             return result
         except Error as e:
             logging.error(f"Error get id category_photos {str(e)}")
