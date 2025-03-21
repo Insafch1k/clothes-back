@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="remade upload_file">
-      <change afterPath="$PROJECT_DIR$/routes_for_clothes/__init__.py" afterDir="false" />
+    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="accepting a request in json format and transferring a file in base64">
+      <change afterPath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/background_removal/background_removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/bl/background_removal/background_removal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/background_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/background_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +162,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742486257019</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="save photo with background and without flashlight in new directory">
+      <option name="closed" value="true" />
+      <created>1742499751185</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1742499751185</updated>
+    </task>
+    <task id="LOCAL-00010" summary="accepting a request in json format and transferring a file in base64">
+      <option name="closed" value="true" />
+      <created>1742540507336</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1742540507336</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -183,6 +199,8 @@
     <MESSAGE value="tshirt photo" />
     <MESSAGE value="add join database" />
     <MESSAGE value="remade upload_file" />
-    <option name="LAST_COMMIT_MESSAGE" value="remade upload_file" />
+    <MESSAGE value="save photo with background and without flashlight in new directory" />
+    <MESSAGE value="accepting a request in json format and transferring a file in base64" />
+    <option name="LAST_COMMIT_MESSAGE" value="accepting a request in json format and transferring a file in base64" />
   </component>
 </project>
