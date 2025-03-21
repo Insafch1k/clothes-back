@@ -4,7 +4,6 @@ import uuid
 import base64
 from bl.background_removal.background_removal import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 from dal.db_query import ManageQuery
-from PIL import Image
 
 background_bp = Blueprint("background", __name__)
 
@@ -17,31 +16,36 @@ if not os.path.exists(PROCESSED_FOLDER):
 @background_bp.route("/upload", methods=["POST"])
 def upload_file():
     """
-    Принимает изображение, удаляет фон и возвращает ссылку на файл.
+    Принимает изображение в формате base64, удаляет фон и возвращает ссылку на файл.
     """
-    user_name = request.form.get("user_name")
-    photo = request.files.get("photo")
+    # Получаем данные из JSON
+    data = request.json
+    user_name = data.get("user_name")
+    photo_base64 = data.get("photo")
 
     # Проверка необходимых данных
     if not user_name:
         return jsonify({"error": "Отсутствует параметр user_name"})
-    if not photo:
-        return jsonify({"error": "Отсутствует файл photo"})
+    if not photo_base64:
+        return jsonify({"error": "Отсутствует параметр photo (base64)"})
 
     try:
-        # Генерируем уникальное имя файла и сохраняем его
+        # Генерируем уникальное имя файла
         filename = f"{uuid.uuid4().hex}.png"
         input_path = os.path.join(UPLOAD_FOLDER, filename)
-        photo.save(input_path)
+
+        # Декодируем base64 и сохраняем изображение
+        try:
+            image_data = base64.b64decode(photo_base64)
+            with open(input_path, "wb") as img_file:
+                img_file.write(image_data)
+        except Exception as decode_error:
+            return jsonify({"error": f"Ошибка декодирования base64: {str(decode_error)}"})
 
         # Удаляем фон
         output_filename = remove_background(input_path)
 
         if output_filename:
-            # Читаем изображение и кодируем в Base64 (если это необходимо для других целей)
-            # with open(input_path, "rb") as img_file:
-            #     image_data = img_file.read()
-
             # Сохраняем информацию о фотографии пользователя
             try:
                 success = ManageQuery.add_photo_user(user_name=user_name, photo_path=input_path, category="full", is_cut=True)
