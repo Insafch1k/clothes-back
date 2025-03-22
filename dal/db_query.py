@@ -86,16 +86,16 @@ class ManageQuery:
                 ret = False
             return ret
         except Error as e:
-            logging.error(f"Error photo_background not exist {str(e)}")
+            logging.error(f"Error photo not exist {str(e)}")
             return None
 
     @staticmethod
-    def check_args_add_photo(id_user, id_category, user_name, category, photo_path):
+    def check_args_add_photo(id_user, id_subcategory, user_name, category, photo_path):
         ret = True
         if id_user is None:
             logging.error(f"User '{user_name}' not found")
             ret = False
-        if id_category is None:
+        if id_subcategory is None:
             logging.error(f"Category '{category}' not found")
             ret = False
         if photo_path == "":
@@ -121,9 +121,9 @@ class ManageQuery:
                     logging.info(f"Photo path added successfully for user {user_name}")
                     ret = True
                 else:
-                    logging.error("Invalid user id, category id or photo_background path is empty")
+                    logging.error("Invalid user id, category id or photo path is empty")
             except Error as e:
-                logging.error(f"Error add photo_background user {str(e)}")
+                logging.error(f"Error add photo user {str(e)}")
         else:
             logging.warning("Это фото уже есть в базе данных у этого человека")
         return ret
@@ -160,48 +160,48 @@ class ManageQuery:
                 ret = False
             return ret
         except Error as e:
-            logging.error(f"Error photo_background not exist {str(e)}")
+            logging.error(f"Error photo not exist {str(e)}")
             return None
 
     @staticmethod
-    def get_id_category_clothes(category):  # Получает id_category фото одежды по названию категории
+    def get_id_subcategory_clothes(subcategory):  # Получает id_subcategory фото одежды по названию подкатегории
         try:
             query = """
-                    SELECT id_category FROM category_clothes
-                    WHERE category = %s
+                    SELECT id_subcategory FROM subcategory_clothes
+                    WHERE subcategory = %s
             """
-            result = ManageQuery._execute_query(query, category, True)
+            result = ManageQuery._execute_query(query, subcategory, True)
             if not result:
                 result = None
             else:
                 result = result[0][0]
             return result
         except Error as e:
-            logging.error(f"Error get id category_photos {str(e)}")
+            logging.error(f"Error get id subcategory_photos {str(e)}")
             return None
 
     @staticmethod
-    def add_photo_clothes(user_name, photo_path, category, is_cut=True):  # Добавляет фото одежды в базу данных
+    def add_photo_clothes(user_name, photo_path, subcategory, is_cut=True):  # Добавляет фото одежды в базу данных
         ret = False
 
         if ManageQuery.photo_clothes_not_exist(photo_path,
                                                user_name):  # Проверяет, существует ли путь к фото одежды в базе данных у этого человека
             try:
                 id_user = ManageQuery.get_id_user(user_name)
-                id_category = ManageQuery.get_id_category_clothes(category)
-                # binary_photo = ManageQuery.photo_in_binary(photo_background)
-                if ManageQuery.check_args_add_photo(id_user, id_category, user_name, category, photo_path):
+                id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
+                # binary_photo = ManageQuery.photo_in_binary(photo)
+                if ManageQuery.check_args_add_photo(id_user, id_subcategory, user_name, subcategory, photo_path):
                     query = """
-                            INSERT INTO photo_clothes (id_user, photo_path, id_category, is_cut)
+                            INSERT INTO photo_clothes (id_user, photo_path, id_subcategory, is_cut)
                             VALUES (%s, %s, %s, %s)
                     """
-                    ManageQuery._execute_query(query, (id_user, photo_path, id_category, is_cut))
+                    ManageQuery._execute_query(query, (id_user, photo_path, id_subcategory, is_cut))
                     logging.info(f"Photo clothes added successfully for user {user_name}")
                     ret = True
                 else:
-                    logging.error("Invalid user id, category id, or photo_path")
+                    logging.error("Invalid user id, subcategory id, or photo_path")
             except Error as e:
-                logging.error(f"Error add photo_background user {str(e)}")
+                logging.error(f"Error add photo user {str(e)}")
         else:
             logging.warning("Это фото одежды уже есть в базе данных у этого человека")
         return ret
