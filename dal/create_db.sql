@@ -30,8 +30,8 @@ CREATE TABLE Category_clothes (
 CREATE TABLE Photo_clothes (
     id_clothes SERIAL PRIMARY KEY,
     id_user INT REFERENCES Users(id_user),
-    photo_path TEXT NOT NULL,  -- Путь к файлу или URL
-    id_category INT REFERENCES Category_clothes(id_category),
+    photo_path TEXT NOT NULL,   -- Путь к файлу или URL
+    id_subcategory INT REFERENCES Subcategory_clothes(id_subcategory),  -- Новое поле
     is_cut BOOLEAN
 );
 
