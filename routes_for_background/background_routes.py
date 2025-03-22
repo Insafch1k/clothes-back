@@ -58,7 +58,7 @@ def upload_file():
 
             # Сохраняем информацию о фотографии пользователя
             try:
-                success = ManageQuery.add_photo_user(user_name=user_name, photo_path=input_path, category="full", is_cut=True)
+                success = ManageQuery.add_photo_user(user_name=user_name, photo_path=processed_path, category="full", is_cut=True)
                 if success:
                     return jsonify({
                         "status": "success",
