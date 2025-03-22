@@ -34,3 +34,10 @@ CREATE TABLE Photo_clothes (
     id_category INT REFERENCES Category_clothes(id_category),
     is_cut BOOLEAN
 );
+
+-- Создание таблицы Subcategory_clothes
+CREATE TABLE Subcategory_clothes (
+    id_subcategory SERIAL PRIMARY KEY,
+    id_category INT REFERENCES Category_clothes(id_category),
+    subcategory TEXT NOT NULL
+);
