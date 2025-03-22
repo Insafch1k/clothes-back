@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 import os
 import uuid
-import base64
+from bl.utils.base64_utils import decode_base64, encode_to_base64
 from bl.background_removal.background_removal import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 from dal.db_query import ManageQuery
 
@@ -36,11 +36,9 @@ def upload_file():
 
         # Декодируем base64 и сохраняем изображение
         try:
-            image_data = base64.b64decode(photo_base64)
-            with open(input_path, "wb") as img_file:
-                img_file.write(image_data)
+            decode_base64(photo_base64, input_path)
         except Exception as decode_error:
-            return jsonify({"error": f"Ошибка декодирования base64: {str(decode_error)}"}), 500
+            return jsonify({"error": str(decode_error)}), 500
 
         # Удаляем фон
         output_filename = remove_background(input_path)
@@ -51,10 +49,9 @@ def upload_file():
 
             # Кодируем обработанное изображение в Base64
             try:
-                with open(processed_path, "rb") as img_file:
-                    encoded_image = base64.b64encode(img_file.read()).decode('utf-8')
+                encoded_image = encode_to_base64(processed_path)
             except Exception as encode_error:
-                return jsonify({"error": f"Ошибка кодирования Base64: {str(encode_error)}"}), 500
+                return jsonify({"error": str(encode_error)}), 500
 
             # Сохраняем информацию о фотографии пользователя
             try:
