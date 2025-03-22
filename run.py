@@ -1,7 +1,7 @@
 #from db_query import ManageQuery
 from flask import Flask
 import logging
-from routes.background_routes import background_bp
+from routes_for_background.background_routes import background_bp
 from flask_cors import CORS
 
 app = Flask(__name__)

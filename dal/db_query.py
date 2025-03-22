@@ -86,7 +86,7 @@ class ManageQuery:
                 ret = False
             return ret
         except Error as e:
-            logging.error(f"Error photo not exist {str(e)}")
+            logging.error(f"Error photo_background not exist {str(e)}")
             return None
 
     @staticmethod
@@ -121,9 +121,9 @@ class ManageQuery:
                     logging.info(f"Photo path added successfully for user {user_name}")
                     ret = True
                 else:
-                    logging.error("Invalid user id, category id or photo path is empty")
+                    logging.error("Invalid user id, category id or photo_background path is empty")
             except Error as e:
-                logging.error(f"Error add photo user {str(e)}")
+                logging.error(f"Error add photo_background user {str(e)}")
         else:
             logging.warning("Это фото уже есть в базе данных у этого человека")
         return ret
@@ -160,7 +160,7 @@ class ManageQuery:
                 ret = False
             return ret
         except Error as e:
-            logging.error(f"Error photo not exist {str(e)}")
+            logging.error(f"Error photo_background not exist {str(e)}")
             return None
 
     @staticmethod
@@ -189,7 +189,7 @@ class ManageQuery:
             try:
                 id_user = ManageQuery.get_id_user(user_name)
                 id_category = ManageQuery.get_id_category_clothes(category)
-                # binary_photo = ManageQuery.photo_in_binary(photo)
+                # binary_photo = ManageQuery.photo_in_binary(photo_background)
                 if ManageQuery.check_args_add_photo(id_user, id_category, user_name, category, photo_path):
                     query = """
                             INSERT INTO photo_clothes (id_user, photo_path, id_category, is_cut)
@@ -201,7 +201,7 @@ class ManageQuery:
                 else:
                     logging.error("Invalid user id, category id, or photo_path")
             except Error as e:
-                logging.error(f"Error add photo user {str(e)}")
+                logging.error(f"Error add photo_background user {str(e)}")
         else:
             logging.warning("Это фото одежды уже есть в базе данных у этого человека")
         return ret

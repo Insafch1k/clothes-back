@@ -13,7 +13,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
-@background_bp.route("/upload", methods=["POST"])
+@background_bp.route("/human", methods=["POST"])
 def upload_file():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
