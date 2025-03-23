@@ -4,11 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add clothes_bl">
+    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add base64_utils.py">
+      <change afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/routes_for_clothes/.env" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/clothes_bl/clothes_bl.py" beforeDir="false" afterPath="$PROJECT_DIR$/bl/clothes_bl/clothes_bl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes_for_background/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_background/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes_for_background/background_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_background/background_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes_for_clothes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_clothes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,7 +183,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742540507336</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="remodeling background routes">
+      <option name="closed" value="true" />
+      <created>1742650585321</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1742650585322</updated>
+    </task>
+    <task id="LOCAL-00012" summary="add base64_utils.py">
+      <option name="closed" value="true" />
+      <created>1742654653609</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1742654653609</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -202,6 +222,8 @@
     <MESSAGE value="remade upload_file" />
     <MESSAGE value="save photo with background and without flashlight in new directory" />
     <MESSAGE value="accepting a request in json format and transferring a file in base64" />
-    <option name="LAST_COMMIT_MESSAGE" value="accepting a request in json format and transferring a file in base64" />
+    <MESSAGE value="remodeling background routes" />
+    <MESSAGE value="add base64_utils.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="add base64_utils.py" />
   </component>
 </project>

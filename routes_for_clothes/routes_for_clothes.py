@@ -2,10 +2,10 @@ from flask import Blueprint, request, jsonify, send_from_directory
 import os
 import uuid
 from bl.utils.base64_utils import decode_base64, encode_to_base64
-from bl.background_removal.background_removal import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
+from bl.clothes_bl.clothes_bl import remove_background_clothes, UPLOAD_FOLDER, PROCESSED_FOLDER
 from dal.db_query import ManageQuery
 
-background_blueprint = Blueprint("background_blueprint", __name__)
+clothes_blueprint = Blueprint("clothes_blueprint", __name__)
 
 # Проверка и создание необходимых папок
 if not os.path.exists(UPLOAD_FOLDER):
@@ -13,8 +13,8 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
-@background_blueprint.route("/human", methods=["POST"])
-def upload_file():
+@clothes_blueprint.route("/clothes", methods=["POST"])
+def process_clothes():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
     """
@@ -22,12 +22,15 @@ def upload_file():
     data = request.json
     user_name = data.get("user_name")
     photo_base64 = data.get("photo")
+    subcategory = data.get("subcategory")
 
     # Проверка необходимых данных
     if not user_name:
         return jsonify({"error": "Отсутствует параметр user_name"}), 400
     if not photo_base64:
         return jsonify({"error": "Отсутствует параметр photo (base64)"}), 400
+    if not subcategory:
+        return jsonify({"error": "Отсутствует параметр subcategory"}), 400
 
     try:
         # Генерируем уникальное имя файла
@@ -41,7 +44,7 @@ def upload_file():
             return jsonify({"error": str(decode_error)}), 500
 
         # Удаляем фон
-        output_filename = remove_background(input_path)
+        output_filename = remove_background_clothes(input_path)
 
         if output_filename:
             # Путь к обработанному изображению
@@ -55,7 +58,7 @@ def upload_file():
 
             # Сохраняем информацию о фотографии пользователя
             try:
-                success = ManageQuery.add_photo_user(user_name=user_name, photo_path=processed_path, category="full", is_cut=True)
+                success = ManageQuery.add_photo_clothes(user_name=user_name, photo_path=processed_path, subcategory=subcategory, is_cut=True)
                 if success:
                     return jsonify({
                         "status": "success",
@@ -72,10 +75,9 @@ def upload_file():
         return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
 
 
-@background_blueprint.route("/processed/<filename>", methods=["GET"])
+@clothes_blueprint.route("/clothes/processed/<filename>", methods=["GET"])
 def get_processed_image(filename):
     """
     Возвращает обработанное изображение по ссылке.
     """
     return send_from_directory(PROCESSED_FOLDER, filename)
-

@@ -1,3 +1,7 @@
-from .background_routes import background_bp
+__all__ = ("background_blueprint",)
 
-all_blueprints = [background_bp]
+from flask import Blueprint
+from .background_routes import background_blueprint as background
+
+background_blueprint = Blueprint("background_main", __name__)
+background_blueprint.register_blueprint(background)
