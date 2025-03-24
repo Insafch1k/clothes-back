@@ -20,9 +20,10 @@ def process_clothes():
     """
     # Получаем данные из JSON
     data = request.json
-    user_name = data.get("user_name")
-    photo_base64 = data.get("photo")
-    subcategory = data.get("subcategory")
+    photo_base64 = data.get("image")
+    user_name = data.get("userId")
+    subcategory = data.get("type")
+
 
     # Проверка необходимых данных
     if not user_name:
@@ -81,3 +82,37 @@ def get_processed_image(filename):
     Возвращает обработанное изображение по ссылке.
     """
     return send_from_directory(PROCESSED_FOLDER, filename)
+
+@clothes_blueprint.route("/clothes/catalog/<subcategory>", methods=["GET"])
+def get_clothes_by_category(subcategory):
+    """
+    Возвращает список одежды из каталога по указанной подкатегории.
+    """
+    try:
+        id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
+
+        if not id_subcategory:
+            return jsonify({"error": f"Подкатегория '{subcategory}' не найдена"}), 404
+
+        clothes_list = ManageQuery.get_clothes_by_subcategory(id_subcategory)
+
+        if not clothes_list:
+            return jsonify({"error": f"Одежда в подкатегории '{subcategory}' не найдена"}), 404
+
+        result = []
+        for item in clothes_list:
+            result.append({
+                "id": item["id"],
+                "user_name": item["user_name"],
+                "photo_path": item["photo_path"],
+                "is_cut": item["is_cut"]
+            })
+
+        return jsonify({
+            "status": "success",
+            "message": f"Найдено {len(result)} элементов в подкатегории '{subcategory}'",
+            "clothes": result
+        }), 200
+
+    except Exception as error:
+        return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500

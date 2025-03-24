@@ -9,6 +9,16 @@ def decode_base64(base64_string, output_path):
     :return: None
     """
     try:
+        # Удаляем префикс, если он есть (например, "data:image/png;base64,")
+        if base64_string.startswith("data:image"):
+            base64_string = base64_string.split(",")[1]
+
+        # Выравниваем строку до кратности 4
+        padding = len(base64_string) % 4
+        if padding != 0:
+            base64_string += "=" * (4 - padding)
+
+        # Декодируем строку
         image_data = base64.b64decode(base64_string)
         with open(output_path, "wb") as img_file:
             img_file.write(image_data)
@@ -27,4 +37,4 @@ def encode_to_base64(file_path):
             encoded_image = base64.b64encode(img_file.read()).decode('utf-8')
         return encoded_image
     except Exception as e:
-        raise ValueError(f"Ошибка кодирования Base64: {str(e)}")
+        raise ValueError(f"Ошибка кодирования в Base64: {str(e)}")

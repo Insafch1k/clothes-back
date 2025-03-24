@@ -18,10 +18,12 @@ def upload_file():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
     """
+
     # Получаем данные из JSON
     data = request.json
-    user_name = data.get("user_name")
-    photo_base64 = data.get("photo")
+    user_name = data.get("userId")
+    photo_base64 = data.get("image")
+    print(data)
 
     # Проверка необходимых данных
     if not user_name:

@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add base64_utils.py">
-      <change afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes_for_clothes/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" afterDir="false" />
+    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add routes_for_clothes and __init__.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes_for_background/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_background/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bl/utils/base64_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bl/utils/base64_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/photo_background/processed_images/3a67002e96f44714a033dd09efa9115e.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/photo_background/uploads/ee63acab842342e1892a0e3ea987af22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/photo_clothes/processed_images_clothes/c956d6191679432bb990b0eb240a0d24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/photo_clothes/uploads_clothes/247887ccdbca48aa8e9cd3c672afca8f.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/routes_for_background/background_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_background/background_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes_for_clothes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_clothes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -199,7 +200,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742654653609</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="add routes_for_clothes and __init__.py">
+      <option name="closed" value="true" />
+      <created>1742735891802</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1742735891802</updated>
+    </task>
+    <task id="LOCAL-00014" summary="add routes_for_clothes and __init__.py">
+      <option name="closed" value="true" />
+      <created>1742736356840</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1742736356840</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -224,6 +241,7 @@
     <MESSAGE value="accepting a request in json format and transferring a file in base64" />
     <MESSAGE value="remodeling background routes" />
     <MESSAGE value="add base64_utils.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="add base64_utils.py" />
+    <MESSAGE value="add routes_for_clothes and __init__.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="add routes_for_clothes and __init__.py" />
   </component>
 </project>
