@@ -10,8 +10,11 @@ def decode_base64(base64_string, output_path):
     """
     try:
         # Удаляем префикс, если он есть (например, "data:image/png;base64,")
-        if base64_string.startswith("data:image"):
+        if isinstance(base64_string, str) and base64_string.startswith("data:image"):
             base64_string = base64_string.split(",")[1]
+
+        # Удаляем пробелы и переносы строк
+        base64_string = base64_string.strip()
 
         # Выравниваем строку до кратности 4
         padding = len(base64_string) % 4
@@ -24,7 +27,6 @@ def decode_base64(base64_string, output_path):
             img_file.write(image_data)
     except Exception as e:
         raise ValueError(f"Ошибка декодирования Base64: {str(e)}")
-
 def encode_to_base64(file_path):
     """
     Кодирует файл в строку Base64.
