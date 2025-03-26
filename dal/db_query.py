@@ -90,7 +90,8 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def check_args_add_photo(id_user, id_category, id_sub_subcategory, user_name, category, sub_subcategory,
+    def check_args_add_photo(id_user, id_category, id_subcategory, id_sub_subcategory, user_name, category, subcategory,
+                             sub_subcategory,
                              photo_path):
         ret = True
         if id_user is None:
@@ -98,6 +99,9 @@ class ManageQuery:
             ret = False
         if id_category is None:
             logging.error(f"Category '{category}' not found")
+            ret = False
+        if id_subcategory is None:
+            logging.error(f"Subcategory '{subcategory}' not found")
             ret = False
         if id_sub_subcategory is None:
             logging.error(f"Sub_subcategory '{sub_subcategory}' not found")
@@ -181,7 +185,7 @@ class ManageQuery:
                 result = result[0][0]
             return result
         except Error as e:
-            logging.error(f"Error get id category_photos {str(e)}")
+            logging.error(f"Error get id category_clothes {str(e)}")
             return None
 
     @staticmethod
@@ -199,11 +203,29 @@ class ManageQuery:
                 result = result[0][0]
             return result
         except Error as e:
-            logging.error(f"Error get id sub_subcategory_photos {str(e)}")
+            logging.error(f"Error get id sub_subcategory_clothes {str(e)}")
             return None
 
     @staticmethod
-    def add_photo_clothes(user_name, photo_path, category, sub_subcategory,
+    def get_id_subcategory_clothes(
+            subcategory):  # Получает id_subcategory фото одежды по названию подкатегории
+        try:
+            query = """
+                    SELECT id_subcategory FROM subcategory_clothes
+                    WHERE subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, subcategory, True)
+            if not result:
+                result = None
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error get id subcategory_clothes {str(e)}")
+            return None
+
+    @staticmethod
+    def add_photo_clothes(user_name, photo_path, category, subcategory, sub_subcategory,
                           is_cut=True):  # Добавляет фото одежды в базу данных
         ret = False
 
@@ -212,17 +234,19 @@ class ManageQuery:
             try:
                 id_user = ManageQuery.get_id_user(user_name)
                 id_category = ManageQuery.get_id_category_clothes(category)
+                id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
                 id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
 
                 # binary_photo = ManageQuery.photo_in_binary(photo)
-                if ManageQuery.check_args_add_photo(id_user, id_category, id_sub_subcategory, user_name, category,
+                if ManageQuery.check_args_add_photo(id_user, id_category, id_subcategory, id_sub_subcategory, user_name,
+                                                    category,
                                                     sub_subcategory, photo_path):
                     query = """
                             INSERT INTO photo_clothes (id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut)
                             VALUES (%s, %s, %s, %s, %s, %s)
                     """
-                    ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory, user_name, category,
-                                                       sub_subcategory, photo_path))
+                    ManageQuery._execute_query(query, (
+                        id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut))
                     logging.info(f"Photo clothes added successfully for user {user_name}")
                     ret = True
                 else:

@@ -1,12 +1,12 @@
 from flask import Flask
 from flask_cors import CORS
-from __init__ import all_blueprints
+from __init__ import main_blueprint  # Измененный импорт
 
 app = Flask(__name__)
-
-app.register_blueprint(all_blueprints)
-
 CORS(app)
 
+# Регистрация основного Blueprint
+app.register_blueprint(main_blueprint)
+
 if __name__ == "__main__":
-     app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
