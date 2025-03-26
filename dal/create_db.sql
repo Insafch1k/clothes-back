@@ -34,7 +34,7 @@ CREATE TABLE Subcategory_clothes (
 
 -- Создание таблицы Subcategory_clothes
 CREATE TABLE Sub_subcategory_clothes (
-    id_subcategory SERIAL PRIMARY KEY,
+    id_sub_subcategory SERIAL PRIMARY KEY,
     sub_subcategory TEXT NOT NULL
 );
 
