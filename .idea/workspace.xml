@@ -4,16 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="add routes_for_clothes and __init__.py">
+    <list default="true" id="bb567b78-ffcc-4023-98e8-db7d83659eeb" name="Changes" comment="remade base64_utils.py">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bl/utils/base64_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bl/utils/base64_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dal/.env" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/photo_background/processed_images/3a67002e96f44714a033dd09efa9115e.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/photo_background/uploads/ee63acab842342e1892a0e3ea987af22.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/photo_clothes/processed_images_clothes/c956d6191679432bb990b0eb240a0d24.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/photo_clothes/uploads_clothes/247887ccdbca48aa8e9cd3c672afca8f.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes_for_background/background_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_background/background_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes_for_background/.env" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes_for_clothes/.env" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes_for_clothes/routes_for_clothes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,15 +51,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.find_pose.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.find_pose.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="clothes-back" />
@@ -216,7 +217,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742736356840</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="remade base64_utils.py">
+      <option name="closed" value="true" />
+      <created>1742843816931</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1742843816931</updated>
+    </task>
+    <task id="LOCAL-00016" summary="remade base64_utils.py">
+      <option name="closed" value="true" />
+      <created>1742882700558</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1742882700558</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -242,6 +259,7 @@
     <MESSAGE value="remodeling background routes" />
     <MESSAGE value="add base64_utils.py" />
     <MESSAGE value="add routes_for_clothes and __init__.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="add routes_for_clothes and __init__.py" />
+    <MESSAGE value="remade base64_utils.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="remade base64_utils.py" />
   </component>
 </project>
