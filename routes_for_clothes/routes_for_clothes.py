@@ -13,6 +13,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
+
 @clothes_blueprint.route("/clothes", methods=["POST"])
 def process_clothes():
     """
@@ -51,12 +52,6 @@ def process_clothes():
             # Путь к обработанному изображению
             processed_path = os.path.join(PROCESSED_FOLDER, output_filename)
 
-            # Кодируем обработанное изображение в Base64
-            try:
-                encoded_image = encode_to_base64(processed_path)
-            except Exception as encode_error:
-                return jsonify({"error": str(encode_error)}), 500
-
             # Сохраняем информацию о фотографии пользователя
             try:
                 success = ManageQuery.add_photo_clothes(user_name=user_name, photo_path=processed_path, subcategory=subcategory, is_cut=True)
@@ -83,36 +78,4 @@ def get_processed_image(filename):
     """
     return send_from_directory(PROCESSED_FOLDER, filename)
 
-@clothes_blueprint.route("/clothes/catalog/<subcategory>", methods=["GET"])
-def get_clothes_by_category(subcategory):
-    """
-    Возвращает список одежды из каталога по указанной подкатегории.
-    """
-    try:
-        id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
 
-        if not id_subcategory:
-            return jsonify({"error": f"Подкатегория '{subcategory}' не найдена"}), 404
-
-        clothes_list = ManageQuery.get_clothes_by_subcategory(id_subcategory)
-
-        if not clothes_list:
-            return jsonify({"error": f"Одежда в подкатегории '{subcategory}' не найдена"}), 404
-
-        result = []
-        for item in clothes_list:
-            result.append({
-                "id": item["id"],
-                "user_name": item["user_name"],
-                "photo_path": item["photo_path"],
-                "is_cut": item["is_cut"]
-            })
-
-        return jsonify({
-            "status": "success",
-            "message": f"Найдено {len(result)} элементов в подкатегории '{subcategory}'",
-            "clothes": result
-        }), 200
-
-    except Exception as error:
-        return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500

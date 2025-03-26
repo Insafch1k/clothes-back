@@ -49,12 +49,6 @@ def upload_file():
             # Путь к обработанному изображению
             processed_path = os.path.join(PROCESSED_FOLDER, output_filename)
 
-            # Кодируем обработанное изображение в Base64
-            try:
-                encoded_image = encode_to_base64(processed_path)
-            except Exception as encode_error:
-                return jsonify({"error": str(encode_error)}), 500
-
             # Сохраняем информацию о фотографии пользователя
             try:
                 success = ManageQuery.add_photo_user(user_name=user_name, photo_path=processed_path, category="full", is_cut=True)
