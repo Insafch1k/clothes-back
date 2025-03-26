@@ -14,7 +14,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
-def remove_background_clothes(input_path):
+def remove_background_clothes(photo_base64):
     """
     Удаляет фон из изображения и сохраняет результат.
     """

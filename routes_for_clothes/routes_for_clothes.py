@@ -59,7 +59,7 @@ def process_clothes():
                     return jsonify({
                         "status": "success",
                         "message": "Фон успешно удален",
-                        "image_base64": f"data:image/png;base64,{encoded_image}"
+                        "image_base64": f"data:image/png;base64,{photo_base64}"
                     })
                 else:
                     return jsonify({"error": "Ошибка сохранения данных в БД"}), 500

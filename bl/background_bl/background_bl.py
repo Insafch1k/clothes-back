@@ -14,7 +14,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
-def remove_background(input_path):
+def remove_background(photo_base64):
     try:
         input_image = Image.open(input_path)
         output_image = remove(input_image)

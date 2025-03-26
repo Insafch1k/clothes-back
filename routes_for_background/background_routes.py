@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, send_from_directory
 import os
 import uuid
 from bl.utils.base64_utils import decode_base64, encode_to_base64
-from bl.background_removal.background_removal import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
+from bl.background_bl.background_bl import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 from dal.db_query import ManageQuery
 
 background_blueprint = Blueprint("background_blueprint", __name__)
@@ -56,7 +56,7 @@ def upload_file():
                     return jsonify({
                         "status": "success",
                         "message": "Фон успешно удален",
-                        "image_base64": f"data:image/png;base64,{encoded_image}"
+                        "image_base64": f"data:image/png;base64,{photo_base64}"
                     })
                 else:
                     return jsonify({"error": "Ошибка сохранения данных в БД"}), 500
