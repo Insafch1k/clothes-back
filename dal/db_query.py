@@ -8,6 +8,7 @@ from dal.db_connection import DBConnection
 from psycopg2 import Error
 import logging
 from dotenv import load_dotenv
+from bl.utils.check_args import CheckArgs
 
 load_dotenv()  # Загружаем переменные окружения из .env файла
 
@@ -90,27 +91,6 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def check_args_add_photo(id_user, id_category, id_subcategory, id_sub_subcategory, user_name, category, subcategory,
-                             sub_subcategory,
-                             photo_path):
-        ret = True
-        if id_user is None:
-            logging.error(f"User '{user_name}' not found")
-            ret = False
-        if id_category is None:
-            logging.error(f"Category '{category}' not found")
-            ret = False
-        if id_subcategory is None:
-            logging.error(f"Subcategory '{subcategory}' not found")
-            ret = False
-        if id_sub_subcategory is None:
-            logging.error(f"Sub_subcategory '{sub_subcategory}' not found")
-            ret = False
-        if photo_path == "":
-            logging.error("Photo path is empty")
-        return ret
-
-    @staticmethod
     def add_photo_user(user_name, photo_path, category="full",
                        is_cut=True):  # Добавляет путь к фото человека в базу данных
         ret = False
@@ -120,7 +100,7 @@ class ManageQuery:
             try:
                 id_user = ManageQuery.get_id_user(user_name)
                 id_category = ManageQuery.get_id_category_photos(category)
-                if ManageQuery.check_args_add_photo(id_user, id_category, user_name, category, photo_path):
+                if CheckArgs.check_args_add_photo_person(id_user, id_category, user_name, category, photo_path):
                     query = """
                             INSERT INTO photo_users (id_user, photo_path, id_category, is_cut)
                             VALUES (%s, %s, %s, %s)
@@ -238,9 +218,10 @@ class ManageQuery:
                 id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
 
                 # binary_photo = ManageQuery.photo_in_binary(photo)
-                if ManageQuery.check_args_add_photo(id_user, id_category, id_subcategory, id_sub_subcategory, user_name,
-                                                    category,
-                                                    sub_subcategory, photo_path):
+                if CheckArgs.check_args_add_photo_clothes(id_user, id_category, id_subcategory, id_sub_subcategory,
+                                                          user_name,
+                                                          category, subcategory,
+                                                          sub_subcategory, photo_path):
                     query = """
                             INSERT INTO photo_clothes (id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut)
                             VALUES (%s, %s, %s, %s, %s, %s)
