@@ -15,7 +15,7 @@ load_dotenv()  # Загружаем переменные окружения из
 
 class ManageQuery:
     @staticmethod
-    def _execute_query(query, params=None, fetch=False):  # Метод для выполнения SQL запросов
+    def _execute_query(query, params=None, fetch=False, fetch_insert=False):  # Метод для выполнения SQL запросов
         with DBConnection.get_con() as con:
             with con.cursor() as cursor:
                 try:
@@ -27,13 +27,15 @@ class ManageQuery:
                             params = (params,)
                         cursor.execute(query, params or ())
 
+                    # Обработка результатов
+                    result = None
                     if fetch:
                         result = cursor.fetchall()
-                        return result  # Иначе вернуть весь результат
+                    elif fetch_insert:
+                        result = cursor.fetchone()
 
-                    con.commit()
-
-                    return cursor.fetchone()
+                    con.commit()  # Фиксируем изменения В ЛЮБОМ СЛУЧАЕ
+                    return result
                 except Error as e:
                     # logging.error(f"Error executing query: {str(e)}")
                     con.rollback()
@@ -86,7 +88,7 @@ class ManageQuery:
                         INSERT INTO photo_users (id_user, photo_path, id_category, is_cut)
                         VALUES (%s, %s, %s, %s) returning id_photo
                 """
-                id_clothes = ManageQuery._execute_query(query, (id_user, photo_path, id_category, is_cut))
+                id_clothes = ManageQuery._execute_query(query, (id_user, photo_path, id_category, is_cut), fetch_insert=True)
                 logging.info(f"Photo users added successfully for user {user_name}")
                 ret = id_clothes
             else:
@@ -270,7 +272,7 @@ class ManageQuery:
                         VALUES (%s, %s, %s, %s, %s, %s) returning id_clothes
                 """
                 id_clothes = ManageQuery._execute_query(query, (
-                    id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut))
+                    id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut), fetch_insert=True)
                 logging.info(f"Photo clothes added successfully for user {user_name}")
                 ret = id_clothes
             else:
