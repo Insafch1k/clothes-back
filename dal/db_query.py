@@ -226,6 +226,24 @@ class ManageQuery:
             return None
 
     @staticmethod
+    def get_clothes_by_category_and_sub_subcategory(id_user, id_category, id_sub_subcategory):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
+        try:
+            query = """
+                    SELECT photo_path FROM photo_clothes
+                    WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory), True)
+            if not result:
+                result = None
+            else:
+                for i in range(len(result)):
+                    result[i] = result[i][0]
+            return result
+        except Error as e:
+            logging.error(f"Error get id subcategory_clothes {str(e)}")
+            return None
+          
+    @staticmethod
     def add_hash_photos_clothes(id_clothes, hash):
         ret = False
 
@@ -239,6 +257,7 @@ class ManageQuery:
         except Error as e:
             logging.error(f"Error add_hash_photos_clothes {str(e)}")
         return ret
+
 
     @staticmethod
     def add_photo_clothes(user_name, photo_path, category, subcategory, sub_subcategory,
