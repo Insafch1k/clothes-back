@@ -296,3 +296,28 @@ class ManageQuery:
         else:
             logging.error("Photo path is empty")
         return ret
+
+    @staticmethod
+    def get_user_photos_paginated(id_user, limit=20, offset=0):
+        try:
+            query = """
+                    SELECT id_photo, photo_path
+                    FROM photo_users
+                    WHERE id_user = %s
+                    ORDER BY id_photo DESC
+                    LIMIT %s OFFSET %s
+                """
+            result = ManageQuery._execute_query(query, (id_user, limit, offset), True)
+            if not result:
+                result = None
+            return result
+        except Error as e:
+            logging.error(f"Error get_user_photos_paginated {str(e)}")
+
+    @staticmethod
+    def count_user_photos(id_user):
+        query = "SELECT COUNT(*) FROM photo_users WHERE id_user = %s"
+        result = ManageQuery._execute_query(query, id_user, True)
+        if not result:
+            result = None
+        return result[0][0]

@@ -5,6 +5,7 @@ from bl.utils.base64_utils import Base64Utils
 from bl.background_bl.background_bl import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 from bl.utils.hash import calculate_hash
 from dal.db_query import ManageQuery
+
 # comment
 
 
@@ -86,3 +87,43 @@ def get_processed_image(filename):
     Возвращает обработанное изображение по ссылке.
     """
     return send_from_directory(PROCESSED_FOLDER, filename)
+
+
+@background_blueprint.route("/users/<string:user_name>/photos", methods=["GET"])
+def get_user_photos(user_name):  # user_name из URL!
+    # Пагинация — в query-параметрах
+    page = request.args.get("page", default=1, type=int)
+    per_page = request.args.get("per_page", default=20, type=int)
+
+    if page < 1 or per_page < 1:
+        return jsonify({"error": "page and per_page must be >= 1"}), 400
+
+    try:
+        id_user = ManageQuery.get_id_user(user_name)
+        if not id_user:
+            return jsonify({"error": "User not found"}), 404
+
+        photos = ManageQuery.get_user_photos_paginated(
+            id_user=id_user,
+            limit=per_page,
+            offset=(page - 1) * per_page
+        )
+
+        photos_with_base64 = [
+            {
+                "id": photo[0],
+                # "photo_path": photo["photo_path"],
+                "image_base64": Base64Utils.encode_to_base64(photo[1])
+            }
+            for photo in photos
+        ]
+
+        return jsonify({
+            "page": page,
+            "per_page": per_page,
+            "total_photos": ManageQuery.count_user_photos(id_user),
+            "photos": photos_with_base64
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
