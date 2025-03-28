@@ -2,6 +2,7 @@ from rembg import remove
 from PIL import Image
 import os
 import uuid
+import logging
 
 # Определяем пути для загрузки и обработанных файлов внутри директории photo_clothes
 BASE_PHOTO_DIR = os.path.join(os.getcwd(), "photo_clothes")  # Корневая директория photo_clothes
@@ -13,6 +14,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
+
 
 def remove_background_clothes(input_path):
     """
@@ -28,5 +30,5 @@ def remove_background_clothes(input_path):
         output_image.save(output_path)
         return output_filename
     except Exception as error:
-        print(f"Ошибка обработки изображения: {error}")
+        logging.error(f"Ошибка обработки изображения: {error}")
         return None

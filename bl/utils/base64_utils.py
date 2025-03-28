@@ -74,8 +74,8 @@ class Base64Utils:
         try:
             Base64Utils.decode_base64(photo_base64, input_path)
             return input_path
-        except Exception as decode_error:
-            return jsonify({"error": str(decode_error)}), 500
+        except Exception:
+            raise
 
     @staticmethod
     def encode_to_base64(file_path):

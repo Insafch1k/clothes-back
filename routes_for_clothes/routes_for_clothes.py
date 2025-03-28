@@ -46,11 +46,16 @@ def process_clothes():
 
         # Проверяем уникальность по хэшу
         file_hash = calculate_hash(decode_image)
-
         if not ManageQuery.is_photo_unique(file_hash):
             return jsonify({"error": "Photo already exists"}), 400
 
-        input_path = Base64Utils.writing_file(photo_base64)
+        # Генерируем уникальное имя файла
+        # Декодируем base64 и сохраняем изображение
+        # input_path = Base64Utils.writing_file(photo_base64)
+        try:
+            input_path = Base64Utils.writing_file(photo_base64)
+        except Exception as e:
+            return jsonify({"error": f"Failed to save image: {str(e)}"}), 500
 
         # Удаляем фон
         output_filename = remove_background_clothes(input_path)
@@ -61,10 +66,6 @@ def process_clothes():
 
             # Сохраняем информацию о фотографии пользователя
             try:
-
-                success = ManageQuery.add_photo_clothes(user_name=user_name, photo_path=processed_path, category=category, subcategory=subcategory, sub_subcategory=sub_subcategory, is_cut=True)
-                if success:
-
                 id_clothes = ManageQuery.add_photo_clothes(user_name=user_name, photo_path=processed_path,
                                                            category=category, subcategory=subcategory,
                                                            sub_subcategory=sub_subcategory, is_cut=True)
@@ -113,9 +114,11 @@ def get_clothes_by_category_and_sub_subcategory(user_name, category, sub_subcate
         if id_sub_subcategory is None:
             return jsonify({"error": f"Подподкатегории '{sub_subcategory}' не найдена"}), 404
 
-        clothes_list = ManageQuery.get_clothes_by_category_and_sub_subcategory(id_user=id_user, id_category=id_category, id_sub_subcategory=id_sub_subcategory)
+        clothes_list = ManageQuery.get_clothes_by_category_and_sub_subcategory(id_user=id_user, id_category=id_category,
+                                                                               id_sub_subcategory=id_sub_subcategory)
         if not clothes_list:
-            return jsonify({"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
+            return jsonify(
+                {"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
 
         # result = []
         # for item in clothes_list:
@@ -136,4 +139,3 @@ def get_clothes_by_category_and_sub_subcategory(user_name, category, sub_subcate
 
     except Exception as error:
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
-
