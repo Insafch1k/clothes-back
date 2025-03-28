@@ -120,6 +120,7 @@ def get_clothes_by_category_and_sub_subcategory(user_name, category, sub_subcate
             return jsonify(
                 {"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
 
+
         for i in range(len(clothes_list)):
             clothes_list[i] = Base64Utils.encode_to_base64(clothes_list[i])
 
