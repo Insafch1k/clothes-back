@@ -1,42 +1,93 @@
 import base64
+import os
+import uuid
 
-def decode_base64(base64_string, output_path):
-    """
-    Декодирует строку Base64 и сохраняет результат в файл.
+from flask import jsonify
 
-    :param base64_string: Строка Base64 для декодирования.
-    :param output_path: Путь, куда сохранить декодированный файл.
-    :return: None
-    """
-    try:
-        # Удаляем префикс, если он есть (например, "data:image/png;base64,")
-        if isinstance(base64_string, str) and base64_string.startswith("data:image"):
-            base64_string = base64_string.split(",")[1]
+from bl.background_bl.background_bl import UPLOAD_FOLDER
 
-        # Удаляем пробелы и переносы строк
-        base64_string = base64_string.strip()
 
-        # Выравниваем строку до кратности 4
-        padding = len(base64_string) % 4
-        if padding != 0:
-            base64_string += "=" * (4 - padding)
+class Base64Utils:
+    @staticmethod
+    def decode_base64(base64_string, output_path):
+        """
+        Декодирует строку Base64 и сохраняет результат в файл.
 
-        # Декодируем строку
-        image_data = base64.b64decode(base64_string)
-        with open(output_path, "wb") as img_file:
-            img_file.write(image_data)
-    except Exception as e:
-        raise ValueError(f"Ошибка декодирования Base64: {str(e)}")
-def encode_to_base64(file_path):
-    """
-    Кодирует файл в строку Base64.
+        :param base64_string: Строка Base64 для декодирования.
+        :param output_path: Путь, куда сохранить декодированный файл.
+        :return: None
+        """
+        try:
+            # Удаляем префикс, если он есть (например, "data:image/png;base64,")
+            if isinstance(base64_string, str) and base64_string.startswith("data:image"):
+                base64_string = base64_string.split(",")[1]
 
-    :param file_path: Путь к файлу для кодирования.
-    :return: Строка Base64.
-    """
-    try:
-        with open(file_path, "rb") as img_file:
-            encoded_image = base64.b64encode(img_file.read()).decode('utf-8')
-        return encoded_image
-    except Exception as e:
-        raise ValueError(f"Ошибка кодирования в Base64: {str(e)}")
+            # Удаляем пробелы и переносы строк
+            base64_string = base64_string.strip()
+
+            # Выравниваем строку до кратности 4
+            padding = len(base64_string) % 4
+            if padding != 0:
+                base64_string += "=" * (4 - padding)
+
+            # Декодируем строку
+            image_data = base64.b64decode(base64_string)
+            with open(output_path, "wb") as img_file:
+                img_file.write(image_data)
+        except Exception as e:
+            raise ValueError(f"Ошибка декодирования Base64: {str(e)}")
+
+    @staticmethod
+    def decode_base64_in_image(base64_string):
+        """
+        Декодирует строку Base64 и возвращает фото.
+
+        :param base64_string: Строка Base64 для декодирования.
+        :return: фото
+        """
+        try:
+            # Удаляем префикс, если он есть (например, "data:image/png;base64,")
+            if isinstance(base64_string, str) and base64_string.startswith("data:image"):
+                base64_string = base64_string.split(",")[1]
+
+            # Удаляем пробелы и переносы строк
+            base64_string = base64_string.strip()
+
+            # Выравниваем строку до кратности 4
+            padding = len(base64_string) % 4
+            if padding != 0:
+                base64_string += "=" * (4 - padding)
+
+            # Декодируем строку
+            image_data = base64.b64decode(base64_string)
+            return image_data
+        except Exception as e:
+            raise ValueError(f"Ошибка декодирования Base64 in image: {str(e)}")
+
+    @staticmethod
+    def writing_file(photo_base64):
+        # Генерируем уникальное имя файла
+        filename = f"{uuid.uuid4().hex}.png"
+        input_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        # Декодируем base64 и сохраняем изображение
+        try:
+            Base64Utils.decode_base64(photo_base64, input_path)
+            return input_path
+        except Exception as decode_error:
+            return jsonify({"error": str(decode_error)}), 500
+
+    @staticmethod
+    def encode_to_base64(file_path):
+        """
+        Кодирует файл в строку Base64.
+
+        :param file_path: Путь к файлу для кодирования.
+        :return: Строка Base64.
+        """
+        try:
+            with open(file_path, "rb") as img_file:
+                encoded_image = base64.b64encode(img_file.read()).decode('utf-8')
+            return encoded_image
+        except Exception as e:
+            raise ValueError(f"Ошибка кодирования в Base64: {str(e)}")

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 import os
 import uuid
-from bl.utils.base64_utils import decode_base64, encode_to_base64
+from bl.utils.base64_utils import Base64Utils
 from bl.background_bl.background_bl import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 from dal.db_query import ManageQuery
 
@@ -31,15 +31,7 @@ def upload_file():
         return jsonify({"error": "Отсутствует параметр photo (base64)"}), 400
 
     try:
-        # Генерируем уникальное имя файла
-        filename = f"{uuid.uuid4().hex}.png"
-        input_path = os.path.join(UPLOAD_FOLDER, filename)
-
-        # Декодируем base64 и сохраняем изображение
-        try:
-            decode_base64(photo_base64, input_path)
-        except Exception as decode_error:
-            return jsonify({"error": str(decode_error)}), 500
+        input_path = Base64Utils.writing_file(photo_base64)
 
         # Удаляем фон
         output_filename = remove_background(input_path)
