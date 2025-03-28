@@ -5,6 +5,8 @@ from bl.utils.base64_utils import Base64Utils
 from bl.background_bl.background_bl import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
 from bl.utils.hash import calculate_hash
 from dal.db_query import ManageQuery
+# comment
+
 
 background_blueprint = Blueprint("background_blueprint", __name__)
 
