@@ -204,8 +204,8 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def get_clothes_by_category_and_sub_subcategory(id_user, id_category,
-                                                    id_sub_subcategory):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
+    def get_clothes_from_wardrobe(id_user, id_category,
+                                  id_sub_subcategory):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
         try:
             query = """
                     SELECT photo_path FROM photo_clothes
@@ -219,6 +219,23 @@ class ManageQuery:
                     result[i] = result[i][0]
             return result
         except Error as e:
+            logging.error(f"Error get id subcategory_clothes {str(e)}")
+            return None
+
+    @staticmethod
+    def get_clothes_from_catalog(id_category, id_sub_subcategory):
+        """
+        Возвращает список одежды из каталога по указанной категории и подподкатегории.
+        """
+        try:
+            query = """
+                SELECT photo_path
+                FROM photo_clothes
+                WHERE id_category = %s AND id_sub_subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory), True)
+            return result
+        except  Error as e:
             logging.error(f"Error get id subcategory_clothes {str(e)}")
             return None
 
