@@ -3,6 +3,7 @@ import os
 import uuid
 from bl.utils.base64_utils import Base64Utils
 from bl.background_bl.background_bl import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
+from bl.utils.hash import calculate_hash
 from dal.db_query import ManageQuery
 
 background_blueprint = Blueprint("background_blueprint", __name__)
@@ -13,6 +14,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
+
 @background_blueprint.route("/human", methods=["POST"])
 def upload_file():
     """
@@ -22,7 +24,6 @@ def upload_file():
     data = request.json
     user_name = data.get("user_name")
     photo_base64 = data.get("image")
-    print(data)
 
     # Проверка необходимых данных
     if not user_name:
@@ -31,7 +32,20 @@ def upload_file():
         return jsonify({"error": "Отсутствует параметр photo (base64)"}), 400
 
     try:
-        input_path = Base64Utils.writing_file(photo_base64)
+        # Декодируем base64
+        decode_image = Base64Utils.decode_base64_in_image(photo_base64)
+
+        # Проверяем уникальность по хэшу
+        file_hash = calculate_hash(decode_image)
+        if not ManageQuery.is_photo_users_unique(file_hash):
+            return jsonify({"error": "Photo already exists"}), 400
+
+        # Генерируем уникальное имя файла
+        # Декодируем base64 и сохраняем изображение
+        try:
+            input_path = Base64Utils.writing_file_background(photo_base64)
+        except Exception as e:
+            return jsonify({"error": f"Failed to save image: {str(e)}"}), 500
 
         # Удаляем фон
         output_filename = remove_background(input_path)
@@ -42,12 +56,17 @@ def upload_file():
 
             # Сохраняем информацию о фотографии пользователя
             try:
-                success = ManageQuery.add_photo_user(user_name=user_name, photo_path=processed_path, category="full", is_cut=True)
-                if success:
+                id_photo = ManageQuery.add_photo_user(user_name=user_name, photo_path=processed_path, category="full",
+                                                      is_cut=True)
+
+                if id_photo:
+                    ManageQuery.add_hash_photos_users(id_photo, file_hash)
+                    encode_image = Base64Utils.encode_to_base64(processed_path)
+
                     return jsonify({
                         "status": "success",
                         "message": "Фон успешно удален",
-                        "image_base64": f"data:image/png;base64,{photo_base64}"
+                        "image_base64": f"data:image/png;base64,{encode_image}"
                     })
                 else:
                     return jsonify({"error": "Ошибка сохранения данных в БД"}), 500
@@ -65,5 +84,3 @@ def get_processed_image(filename):
     Возвращает обработанное изображение по ссылке.
     """
     return send_from_directory(PROCESSED_FOLDER, filename)
-
-

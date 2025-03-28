@@ -46,14 +46,14 @@ def process_clothes():
 
         # Проверяем уникальность по хэшу
         file_hash = calculate_hash(decode_image)
-        if not ManageQuery.is_photo_unique(file_hash):
+        if not ManageQuery.is_photo_clothes_unique(file_hash):
             return jsonify({"error": "Photo already exists"}), 400
 
         # Генерируем уникальное имя файла
         # Декодируем base64 и сохраняем изображение
         # input_path = Base64Utils.writing_file(photo_base64)
         try:
-            input_path = Base64Utils.writing_file(photo_base64)
+            input_path = Base64Utils.writing_file_clothes(photo_base64)
         except Exception as e:
             return jsonify({"error": f"Failed to save image: {str(e)}"}), 500
 
@@ -129,7 +129,7 @@ def get_clothes_by_category_and_sub_subcategory(user_name, category, sub_subcate
         #         "is_cut": item["is_cut"]
         #     })
         for i in range(len(clothes_list)):
-            clothes_list[i] = encode_to_base64(clothes_list[i])
+            clothes_list[i] = Base64Utils.encode_to_base64(clothes_list[i])
 
         return jsonify({
             "status": "success",

@@ -3,8 +3,8 @@ import os
 import uuid
 
 from flask import jsonify
-
-from bl.background_bl.background_bl import UPLOAD_FOLDER
+from bl.clothes_bl.clothes_bl import UPLOAD_FOLDER as UPLOAD_FOLDER_CLOTHES
+from bl.background_bl.background_bl import UPLOAD_FOLDER as UPLOAD_FOLDER_BACKGROUND
 
 
 class Base64Utils:
@@ -65,10 +65,23 @@ class Base64Utils:
             raise ValueError(f"Ошибка декодирования Base64 in image: {str(e)}")
 
     @staticmethod
-    def writing_file(photo_base64):
+    def writing_file_clothes(photo_base64):
         # Генерируем уникальное имя файла
         filename = f"{uuid.uuid4().hex}.png"
-        input_path = os.path.join(UPLOAD_FOLDER, filename)
+        input_path = os.path.join(UPLOAD_FOLDER_CLOTHES, filename)
+
+        # Декодируем base64 и сохраняем изображение
+        try:
+            Base64Utils.decode_base64(photo_base64, input_path)
+            return input_path
+        except Exception:
+            raise
+
+    @staticmethod
+    def writing_file_background(photo_base64):
+        # Генерируем уникальное имя файла
+        filename = f"{uuid.uuid4().hex}.png"
+        input_path = os.path.join(UPLOAD_FOLDER_BACKGROUND, filename)
 
         # Декодируем base64 и сохраняем изображение
         try:
