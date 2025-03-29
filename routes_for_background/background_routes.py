@@ -89,7 +89,7 @@ def get_processed_image(filename):
     return send_from_directory(PROCESSED_FOLDER, filename)
 
 
-@background_blueprint.route("/<string:user_name>/photos", methods=["GET"])
+@background_blueprint.route("/user_photos/<user_name>", methods=["GET"])
 def get_user_photos(user_name):  # user_name из URL!
     # Пагинация — в query-параметрах
     page = request.args.get("page", default=1, type=int)
