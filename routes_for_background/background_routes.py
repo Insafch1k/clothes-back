@@ -66,6 +66,10 @@ def upload_file():
                     ManageQuery.add_hash_photos_users(id_photo, file_hash)
                     encode_image = Base64Utils.encode_to_base64(processed_path)
 
+                    # Удаляем необработанное фото
+                    if os.path.exists(input_path):
+                        os.remove(input_path)
+
                     return jsonify({
                         "status": "success",
                         "message": "Фон успешно удален",
