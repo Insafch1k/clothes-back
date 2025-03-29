@@ -18,7 +18,7 @@ if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
 
-@background_blueprint.route("/human", methods=["POST"])
+@background_blueprint.route("/process", methods=["POST"])
 def upload_file():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
@@ -89,14 +89,14 @@ def get_processed_image(filename):
     return send_from_directory(PROCESSED_FOLDER, filename)
 
 
-@background_blueprint.route("/users/<string:user_name>/photos", methods=["GET"])
+@background_blueprint.route("/<string:user_name>/photos", methods=["GET"])
 def get_user_photos(user_name):  # user_name из URL!
     # Пагинация — в query-параметрах
     page = request.args.get("page", default=1, type=int)
-    per_page = request.args.get("per_page", default=20, type=int)
+    limit = request.args.get("limit", default=20, type=int)
 
-    if page < 1 or per_page < 1:
-        return jsonify({"error": "page and per_page must be >= 1"}), 400
+    if page < 1 or limit < 1:
+        return jsonify({"error": "page and limit must be >= 1"}), 400
 
     try:
         id_user = ManageQuery.get_id_user(user_name)
@@ -105,8 +105,8 @@ def get_user_photos(user_name):  # user_name из URL!
 
         photos = ManageQuery.get_user_photos_paginated(
             id_user=id_user,
-            limit=per_page,
-            offset=(page - 1) * per_page
+            limit=limit,
+            offset=(page - 1) * limit
         )
 
         photos_with_base64 = [
@@ -120,7 +120,7 @@ def get_user_photos(user_name):  # user_name из URL!
 
         return jsonify({
             "page": page,
-            "per_page": per_page,
+            "limit": limit,
             "total_photos": ManageQuery.count_user_photos(id_user),
             "photos": photos_with_base64
         })

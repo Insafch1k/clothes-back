@@ -88,7 +88,8 @@ class ManageQuery:
                         INSERT INTO photo_users (id_user, photo_path, id_category, is_cut)
                         VALUES (%s, %s, %s, %s) returning id_photo
                 """
-                id_clothes = ManageQuery._execute_query(query, (id_user, photo_path, id_category, is_cut), fetch_insert=True)
+                id_clothes = ManageQuery._execute_query(query, (id_user, photo_path, id_category, is_cut),
+                                                        fetch_insert=True)
                 logging.info(f"Photo users added successfully for user {user_name}")
                 ret = id_clothes
             else:
@@ -123,7 +124,7 @@ class ManageQuery:
                 WHERE hash = %s
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, file_hash)
+            result = ManageQuery._execute_query(query, file_hash, True)
             ret = True
             if result:
                 ret = False
@@ -141,7 +142,7 @@ class ManageQuery:
                 WHERE hash = %s
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, file_hash)
+            result = ManageQuery._execute_query(query, file_hash, True)
             ret = True
             if result:
                 ret = False

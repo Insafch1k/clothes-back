@@ -14,7 +14,7 @@ if not os.path.exists(PROCESSED_FOLDER):
     os.makedirs(PROCESSED_FOLDER)
 
 
-@clothes_blueprint.route("/clothes", methods=["POST"])
+@clothes_blueprint.route("/process", methods=["POST"])
 def process_clothes():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
@@ -88,7 +88,7 @@ def process_clothes():
         return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
 
 
-@clothes_blueprint.route("/clothes/processed/<filename>", methods=["GET"])
+@clothes_blueprint.route("/processed/<filename>", methods=["GET"])
 def get_processed_image(filename):
     """
     Возвращает обработанное изображение по ссылке.
@@ -96,7 +96,7 @@ def get_processed_image(filename):
     return send_from_directory(PROCESSED_FOLDER, filename)
 
 
-@clothes_blueprint.route("/clothes/wardrobe/<user_name>/<category>/<sub_subcategory>", methods=["GET"])
+@clothes_blueprint.route("/wardrobe/<user_name>/<category>/<sub_subcategory>", methods=["GET"])
 def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
     """
     Возвращает список одежды из каталога по указанной категории и под подкатегории.
@@ -133,7 +133,7 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
 
 
-@clothes_blueprint.route("/clothes/catalog/<category>/<sub_subcategory>", methods=["GET"])
+@clothes_blueprint.route("/catalog/<category>/<sub_subcategory>", methods=["GET"])
 def get_clothes_from_catalog(category, sub_subcategory):
     """
     Возвращает список одежды из каталога по указанной категории и под подкатегории.
