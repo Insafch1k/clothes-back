@@ -267,14 +267,16 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def get_clothes_from_wardrobe(id_user, id_category,
-                                  id_sub_subcategory):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
+    def get_clothes_from_wardrobe_paginated(id_user, id_category,
+                                            id_sub_subcategory, limit=20,
+                                            offset=0):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
         try:
             query = """
                     SELECT photo_path FROM photo_clothes
                     WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s
+                    LIMIT %s OFFSET %s
             """
-            result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory), True)
+            result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory, limit, offset), True)
             if not result:
                 result = None
             else:
@@ -282,11 +284,33 @@ class ManageQuery:
                     result[i] = result[i][0]
             return result
         except Error as e:
-            logging.error(f"Error get id subcategory_clothes {str(e)}")
+            logging.error(f"Error get_clothes_from_wardrobe_paginated {str(e)}")
             return None
 
     @staticmethod
-    def get_clothes_from_catalog(id_category, id_sub_subcategory):
+    def count_clothes_in_wardrobe(id_user, id_category, id_sub_subcategory):
+        """
+        Возвращает общее количество элементов одежды в гардеробе.
+        """
+        try:
+            query = """
+                SELECT COUNT(*)
+                FROM photo_users
+                WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory), fetch=True)
+            if not result:
+                result = None
+            else:
+                for i in range(len(result)):
+                    result[i] = result[i][0]
+            return result
+        except Error as e:
+            logging.error(f"Error count_clothes_in_wardrobe {str(e)}")
+            return None
+
+    @staticmethod
+    def get_clothes_from_catalog_paginated(id_category, id_sub_subcategory, limit=20, offset=0):
         """
         Возвращает список одежды из каталога по указанной категории и подподкатегории.
         """
@@ -295,11 +319,29 @@ class ManageQuery:
                 SELECT photo_path
                 FROM photo_clothes
                 WHERE id_category = %s AND id_sub_subcategory = %s
+                LIMIT %s OFFSET %s
             """
-            result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory), True)
+            result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory, limit, offset), True)
             return result
         except  Error as e:
-            logging.error(f"Error get id subcategory_clothes {str(e)}")
+            logging.error(f"Error get_clothes_from_catalog_paginated {str(e)}")
+            return None
+
+    @staticmethod
+    def count_clothes_in_catalog(id_category, id_sub_subcategory, limit=20, offset=0):
+        """
+        Возвращает общее количество элементов одежды в каталоге.
+        """
+        try:
+            query = """
+                SELECT COUNT(*)
+                FROM photo_clothes
+                WHERE id_category = %s AND id_sub_subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory), fetch=True)
+            return result
+        except  Error as e:
+            logging.error(f"Error count_clothes_in_catalog {str(e)}")
             return None
 
     @staticmethod

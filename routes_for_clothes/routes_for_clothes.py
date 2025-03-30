@@ -141,6 +141,11 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
     Возвращает список одежды из гардероба по указанной категории и под подкатегории.
     """
     try:
+        page = request.args.get("page", default=1, type=int)
+        limit = request.args.get("limit", default=20, type=int)
+        if page < 1 or limit < 1:
+            return jsonify({"error": "page and limit must be >=1"}), 400
+
         id_user = ManageQuery.get_id_user(user_name)
         if id_user is None:
             return jsonify({"error": f"user_name '{user_name}' не найден"}), 404
@@ -153,8 +158,10 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
         if id_sub_subcategory is None:
             return jsonify({"error": f"Подподкатегории '{sub_subcategory}' не найдена"}), 404
 
-        clothes_list = ManageQuery.get_clothes_from_wardrobe(id_user=id_user, id_category=id_category,
-                                                             id_sub_subcategory=id_sub_subcategory)
+        offset = (page - 1) * limit
+
+        clothes_list = ManageQuery.get_clothes_from_wardrobe_paginated(id_user=id_user, id_category=id_category,
+                                                             id_sub_subcategory=id_sub_subcategory, limit=limit, offset=offset)
         if not clothes_list:
             return jsonify(
                 {"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
@@ -165,6 +172,11 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
         return jsonify({
             "status": "success",
             "message": f"Найдено {len(clothes_list)} элементов в категории '{category}' и подкатегории '{sub_subcategory}'",
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total_items": ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_sub_subcategory)
+            },
             "clothes": clothes_list
         }), 200
 
@@ -178,6 +190,12 @@ def get_clothes_from_catalog(category, sub_subcategory):
     Возвращает список одежды из каталога по указанной категории и под подкатегории.
     """
     try:
+        page = request.args.get("page", default=1, type=int)
+        limit = request.args.get("limit", default=20, type=int)
+
+        if page < 1 or limit < 1:
+            return jsonify({"error": "page and limit must be >=1"}), 400
+
         id_category = ManageQuery.get_id_category_clothes(category)
         if id_category is None:
             return jsonify({"error": f"Категория '{category}' не найдена"}), 404
@@ -186,8 +204,10 @@ def get_clothes_from_catalog(category, sub_subcategory):
         if id_sub_subcategory is None:
             return jsonify({"error": f"Подподкатегории '{sub_subcategory}' не найдена"}), 404
 
-        clothes_list = ManageQuery.get_clothes_from_catalog(id_category=id_category,
-                                                            id_sub_subcategory=id_sub_subcategory)
+        offset = (page - 1) * limit
+
+        clothes_list = ManageQuery.get_clothes_from_catalog_paginated(id_category=id_category,
+                                                            id_sub_subcategory=id_sub_subcategory, limit=limit, offset=offset)
         if not clothes_list:
             return jsonify(
                 {"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
@@ -198,6 +218,11 @@ def get_clothes_from_catalog(category, sub_subcategory):
         return jsonify({
             "status": "success",
             "message": f"Найдено {len(clothes_list)} элементов в категории '{category}' и подкатегории '{sub_subcategory}'",
+            "pagination":{
+                "page": page,
+                "limit": limit,
+                "total_items": ManageQuery.count_clothes_in_catalog(id_category, id_sub_subcategory)
+            },
             "clothes": clothes_list
         }), 200
 
