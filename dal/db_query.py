@@ -98,22 +98,42 @@ class ManageQuery:
             logging.error(f"Error add photo user {str(e)}")
         return ret
 
+    # @staticmethod
+    # def delete_photo_user(photo_path):  # Удаляет путь фото человека из базы данных
+    #     ret = False
+    #     if photo_path:
+    #         try:
+    #             query = """
+    #                     DELETE FROM photo_users
+    #                     WHERE photo_path = %s
+    #             """
+    #             ManageQuery._execute_query(query, photo_path)
+    #             ret = True
+    #         except Error as e:
+    #             logging.error(f"Error delete photo_path user: {str(e)}")
+    #     else:
+    #         logging.error("Photo path is empty")
+    #     return ret
+
     @staticmethod
-    def delete_photo_user(photo_path):  # Удаляет путь фото человека из базы данных
-        ret = False
-        if photo_path:
+    def delete_photo_user(id_photo):  # Мягкое удаление фото пользователя из базы данных
+        if id_photo:
             try:
                 query = """
-                        DELETE FROM photo_users
-                        WHERE photo_path = %s
+                        UPDATE photo_users
+                        SET deleted_at = CURRENT_TIMESTAMP
+                        WHERE id_photo = %s
+                        RETURNING id_photo
                 """
-                ManageQuery._execute_query(query, photo_path)
-                ret = True
+                result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
+                if not result:
+                    result = None
+                return result
             except Error as e:
-                logging.error(f"Error delete photo_path user: {str(e)}")
+                logging.error(f"Error delete photo user: {str(e)}")
         else:
-            logging.error("Photo path is empty")
-        return ret
+            logging.error("id photo is empty")
+            return False
 
     @staticmethod
     def is_photo_clothes_unique(file_hash):
@@ -300,22 +320,50 @@ class ManageQuery:
         return ret
 
     @staticmethod
-    def delete_photo_clothes(photo_path):  # Удаляет фото одежды из базы данных
-        ret = False
-        if photo_path:
+    def delete_photo_clothes(id_clothes):  # Мягкое удаление фото одежды из базы данных
+        if not id_clothes:
+            logging.error("id clothes is empty")
+            return {'status': 'error', 'message': 'ID одежды не указан'}
 
-            try:
-                query = """
-                        DELETE FROM photo_clothes
-                        WHERE photo_path = %s
-                """
-                ManageQuery._execute_query(query, photo_path)
-                ret = True
-            except Error as e:
-                logging.error(f"Error delete photo_path clothes: {str(e)}")
-        else:
-            logging.error("Photo path is empty")
-        return ret
+        try:
+            # Проверяем существование записи
+            if not ManageQuery.exist_id_clothes(id_clothes):
+                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} не найдена'}
+
+            # Проверяем, не удалена ли уже запись
+            if ManageQuery.is_clothes_deleted(id_clothes):
+                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} уже удалена'}
+
+            # Выполняем мягкое удаление
+            query = """
+                UPDATE photo_clothes
+                SET deleted_at = CURRENT_TIMESTAMP
+                WHERE id_clothes = %s
+                RETURNING id_clothes
+            """
+            result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
+
+            if result:
+                return {'status': 'success', 'id': result[0]}
+            return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
+
+        except Error as e:
+            logging.error(f"Error delete photo clothes: {str(e)}")
+            return {'status': 'error', 'message': f'Ошибка базы данных: {str(e)}'}
+
+    @staticmethod
+    def is_clothes_deleted(id_clothes) -> bool:
+        """Проверяет, удалена ли уже запись"""
+        try:
+            query = """
+                SELECT id_clothes FROM photo_clothes
+                WHERE id_clothes = %s AND deleted_at IS NOT NULL
+            """
+            result = ManageQuery._execute_query(query, id_clothes, fetch=True)
+            return bool(result)
+        except Error as e:
+            logging.error(f"Error in is_clothes_deleted: {str(e)}")
+            return False
 
     @staticmethod
     def get_user_photos_paginated(id_user, limit=20, offset=0):
@@ -336,8 +384,27 @@ class ManageQuery:
 
     @staticmethod
     def count_user_photos(id_user):
-        query = "SELECT COUNT(*) FROM photo_users WHERE id_user = %s"
-        result = ManageQuery._execute_query(query, id_user, True)
-        if not result:
-            result = None
-        return result[0][0]
+        try:
+            query = "SELECT COUNT(*) FROM photo_users WHERE id_user = %s"
+            result = ManageQuery._execute_query(query, id_user, True)
+            if not result:
+                result = None
+            return result[0][0]
+        except Error as e:
+            logging.error(f"Error count user photos {str(e)}")
+
+    @staticmethod
+    def exist_id_clothes(id_clothes):
+        try:
+            query = """
+                    SELECT id_clothes FROM photo_clothes
+                    WHERE id_clothes = %s
+            """
+            result = ManageQuery._execute_query(query, id_clothes, fetch=True)
+            if not result:
+                result = None
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error exist id clothes {str(e)}")

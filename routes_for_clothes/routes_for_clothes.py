@@ -88,6 +88,41 @@ def process_clothes():
         return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
 
 
+@clothes_blueprint.route("/delete/<id_clothes>", methods=["DELETE"])
+def delete_photo_clothes(id_clothes):
+    """
+    Удаляет фото одежды из гардероба пользователя
+    :param id_clothes: id фото одежды
+    :return: JSON с результатом операции
+    """
+    try:
+        ret = None
+
+        result = ManageQuery.delete_photo_clothes(id_clothes)
+
+        if result["status"] == "success":
+            ret = jsonify({
+                "status": "success",
+                "message": f"Фото одежды с id {id_clothes} успешно удалено",
+                "id": result["id"]
+            }), 200
+
+        elif result["status"] == "error":
+            ret = jsonify({
+                "status": "error",
+                "message": result["message"],
+                "id": id_clothes
+            }), 404 if 'не найдена' in result['message'] else 400
+
+        return ret
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Внутренняя ошибка сервера: {str(e)}",
+            "id": id_clothes
+        }), 500
+
+
 @clothes_blueprint.route("/processed/<filename>", methods=["GET"])
 def get_processed_image(filename):
     """
@@ -99,7 +134,7 @@ def get_processed_image(filename):
 @clothes_blueprint.route("/wardrobe/<user_name>/<category>/<sub_subcategory>", methods=["GET"])
 def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
     """
-    Возвращает список одежды из каталога по указанной категории и под подкатегории.
+    Возвращает список одежды из гардероба по указанной категории и под подкатегории.
     """
     try:
         id_user = ManageQuery.get_id_user(user_name)
