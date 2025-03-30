@@ -117,23 +117,66 @@ class ManageQuery:
 
     @staticmethod
     def delete_photo_user(id_photo):  # Мягкое удаление фото пользователя из базы данных
-        if id_photo:
-            try:
-                query = """
-                        UPDATE photo_users
-                        SET deleted_at = CURRENT_TIMESTAMP
-                        WHERE id_photo = %s
-                        RETURNING id_photo
-                """
-                result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
-                if not result:
-                    result = None
-                return result
-            except Error as e:
-                logging.error(f"Error delete photo user: {str(e)}")
-        else:
+        if not id_photo:
             logging.error("id photo is empty")
+            return {'status': 'error', 'message': 'ID фото пользователя не указан'}
+
+        try:
+            # Проверяем существование записи
+            if not ManageQuery.exist_id_photo_user(id_photo):
+                return {'status': 'error', 'message': f'Фото с ID {id_photo} не найдено'}
+
+            # Проверяем, не удалена ли уже запись
+            if ManageQuery.is_photo_user_deleted(id_photo):
+                return {'status': 'error', 'message': f'Фото с ID {id_photo} уже удалено'}
+
+            # Выполняем мягкое удаление
+            query = """
+                    UPDATE photo_users
+                    SET deleted_at = CURRENT_TIMESTAMP
+                    WHERE id_photo = %s
+                    RETURNING id_photo
+            """
+            result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
+
+            if result:
+                return {'status': 'success', 'id': result[0]}
+            return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
+
+        except Error as e:
+            logging.error(f"Error delete photo user: {str(e)}")
+            return {'status': 'error', 'message': f'Ошибка базы данных: {str(e)}'}
+
+    @staticmethod
+    def is_photo_user_deleted(id_photo) -> bool:
+        """Проверяет, удалена ли уже запись"""
+        try:
+            query = """
+                SELECT id_photo FROM photo_users
+                WHERE id_photo = %s AND deleted_at IS NOT NULL
+            """
+            result = ManageQuery._execute_query(query, id_photo, fetch=True)
+            return bool(result)
+        except Error as e:
+            logging.error(f"Error in is photo user deleted: {str(e)}")
             return False
+
+    @staticmethod
+    def exist_id_photo_user(id_photo):
+        try:
+            query = """
+                    SELECT id_photo FROM photo_users
+                    WHERE id_photo = %s
+            """
+            result = ManageQuery._execute_query(query, id_photo, fetch=True)
+            if not result:
+                result = None
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error exist id photo {str(e)}")
+
 
     @staticmethod
     def is_photo_clothes_unique(file_hash):
