@@ -177,7 +177,6 @@ class ManageQuery:
         except Error as e:
             logging.error(f"Error exist id photo {str(e)}")
 
-
     @staticmethod
     def is_photo_clothes_unique(file_hash):
         """Проверяет, есть ли уже такое фото одежды у пользователя"""
