@@ -98,22 +98,21 @@ class ManageQuery:
             logging.error(f"Error add photo user {str(e)}")
         return ret
 
-    # @staticmethod
-    # def delete_photo_user(photo_path):  # Удаляет путь фото человека из базы данных
-    #     ret = False
-    #     if photo_path:
-    #         try:
-    #             query = """
-    #                     DELETE FROM photo_users
-    #                     WHERE photo_path = %s
-    #             """
-    #             ManageQuery._execute_query(query, photo_path)
-    #             ret = True
-    #         except Error as e:
-    #             logging.error(f"Error delete photo_path user: {str(e)}")
-    #     else:
-    #         logging.error("Photo path is empty")
-    #     return ret
+    @staticmethod
+    def delete_hash_photos_users(id_photo):
+        try:
+            query = """
+                    DELETE FROM hash_photos_users
+                    WHERE id_photo = %s RETURNING id_photo
+            """
+            result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
+
+            if not result:
+                result = None
+            return result
+        except Error as e:
+            logging.error(f"Error delete hash photos clothes {str(e)}")
+            return False
 
     @staticmethod
     def delete_photo_user(id_photo):  # Мягкое удаление фото пользователя из базы данных
@@ -139,7 +138,7 @@ class ManageQuery:
             """
             result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
 
-            if result:
+            if result and ManageQuery.delete_hash_photos_users(id_photo):
                 return {'status': 'success', 'id': result[0]}
             return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
 
@@ -166,7 +165,7 @@ class ManageQuery:
         try:
             query = """
                     SELECT id_photo FROM photo_users
-                    WHERE id_photo = %s
+                    WHERE id_photo = %s AND deleted_at IS NULL
             """
             result = ManageQuery._execute_query(query, id_photo, fetch=True)
             if not result:
@@ -272,7 +271,7 @@ class ManageQuery:
         try:
             query = """
                     SELECT photo_path FROM photo_clothes
-                    WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s
+                    WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
             """
             result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory), True)
             if not result:
@@ -294,7 +293,7 @@ class ManageQuery:
             query = """
                 SELECT photo_path
                 FROM photo_clothes
-                WHERE id_category = %s AND id_sub_subcategory = %s
+                WHERE id_category = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
             """
             result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory), True)
             return result
@@ -362,6 +361,22 @@ class ManageQuery:
         return ret
 
     @staticmethod
+    def delete_hash_photos_clothes(id_clothes):
+        try:
+            query = """
+                    DELETE FROM hash_photos_clothes
+                    WHERE id_clothes = %s RETURNING id_clothes
+            """
+            result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
+
+            if not result:
+                result = None
+            return result
+        except Error as e:
+            logging.error(f"Error delete hash photos clothes {str(e)}")
+            return False
+
+    @staticmethod
     def delete_photo_clothes(id_clothes):  # Мягкое удаление фото одежды из базы данных
         if not id_clothes:
             logging.error("id clothes is empty")
@@ -385,7 +400,7 @@ class ManageQuery:
             """
             result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
 
-            if result:
+            if result and ManageQuery.delete_hash_photos_clothes(id_clothes):
                 return {'status': 'success', 'id': result[0]}
             return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
 
@@ -413,7 +428,7 @@ class ManageQuery:
             query = """
                     SELECT id_photo, photo_path
                     FROM photo_users
-                    WHERE id_user = %s
+                    WHERE id_user = %s AND deleted_at IS NULL
                     ORDER BY id_photo DESC
                     LIMIT %s OFFSET %s
                 """
@@ -427,7 +442,10 @@ class ManageQuery:
     @staticmethod
     def count_user_photos(id_user):
         try:
-            query = "SELECT COUNT(*) FROM photo_users WHERE id_user = %s"
+            query = """
+                    SELECT COUNT(*) FROM photo_users
+                    WHERE id_user = %s AND deleted_at IS NULL
+            """
             result = ManageQuery._execute_query(query, id_user, True)
             if not result:
                 result = None
@@ -440,7 +458,7 @@ class ManageQuery:
         try:
             query = """
                     SELECT id_clothes FROM photo_clothes
-                    WHERE id_clothes = %s
+                    WHERE id_clothes = %s AND deleted_at IS NULL
             """
             result = ManageQuery._execute_query(query, id_clothes, fetch=True)
             if not result:
