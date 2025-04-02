@@ -53,6 +53,10 @@ def upload_file():
         # Удаляем фон
         output_filename = remove_background(input_path)
 
+        # Удаляем необработанное фото
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
         if output_filename:
             # Путь к обработанному изображению
             processed_path = os.path.join(PROCESSED_FOLDER, output_filename)
@@ -65,10 +69,6 @@ def upload_file():
                 if id_photo:
                     ManageQuery.add_hash_photos_users(id_photo, file_hash)
                     encode_image = Base64Utils.encode_to_base64(processed_path)
-
-                    # Удаляем необработанное фото
-                    if os.path.exists(input_path):
-                        os.remove(input_path)
 
                     return jsonify({
                         "status": "success",
