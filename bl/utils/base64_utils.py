@@ -4,6 +4,7 @@ import uuid
 
 from flask import jsonify
 from bl.clothes_bl.clothes_bl import UPLOAD_FOLDER as UPLOAD_FOLDER_CLOTHES
+from bl.clothes_bl.clothes_bl import UPLOAD_FOLDER_CATALOG
 from bl.background_bl.background_bl import UPLOAD_FOLDER as UPLOAD_FOLDER_BACKGROUND
 
 
@@ -69,6 +70,19 @@ class Base64Utils:
         # Генерируем уникальное имя файла
         filename = f"{uuid.uuid4().hex}.png"
         input_path = os.path.join(UPLOAD_FOLDER_CLOTHES, filename)
+
+        # Декодируем base64 и сохраняем изображение
+        try:
+            Base64Utils.decode_base64(photo_base64, input_path)
+            return input_path
+        except Exception:
+            raise
+
+    @staticmethod
+    def writing_file_clothes_catalog(photo_base64):
+        # Генерируем уникальное имя файла
+        filename = f"{uuid.uuid4().hex}.png"
+        input_path = os.path.join(UPLOAD_FOLDER_CATALOG, filename)
 
         # Декодируем base64 и сохраняем изображение
         try:
