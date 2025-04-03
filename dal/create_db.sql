@@ -51,6 +51,12 @@ CREATE TABLE hash_photos_clothes (
     hash TEXT NOT NULL UNIQUE
 );
 
+-- Таблица хэшей фото каталога
+CREATE TABLE hash_photos_catalog (
+    id_clothes SERIAL PRIMARY KEY,
+    hash TEXT NOT NULL UNIQUE
+);
+
 -- Создание таблицы Photo_clothes
 CREATE TABLE Photo_clothes (
     id_clothes SERIAL PRIMARY KEY,

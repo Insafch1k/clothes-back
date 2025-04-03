@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from bl.utils.base64_utils import Base64Utils
-from bl.clothes_bl.clothes_bl import remove_background_clothes, UPLOAD_FOLDER, PROCESSED_FOLDER
+from bl.clothes_bl.clothes_bl import remove_background_clothes, UPLOAD_FOLDER, PROCESSED_FOLDER, UPLOAD_FOLDER_CATALOG, \
+    PROCESSED_FOLDER_CATALOG, remove_background_clothes_catalog
 from dal.db_query import ManageQuery
 from bl.utils.hash import calculate_hash
+from bl.utils.check_args import CheckArgs
 
 clothes_blueprint = Blueprint("clothes_blueprint", __name__)
 
