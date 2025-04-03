@@ -195,24 +195,6 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def is_photo_catalog_unique(file_hash):
-        """Проверяет, есть ли уже такое фото одежды в каталоге"""
-        try:
-            query = """
-                SELECT id_clothes FROM hash_photos_catalog
-                WHERE hash = %s
-                LIMIT 1
-            """
-            result = ManageQuery._execute_query(query, file_hash, True)
-            ret = True
-            if result:
-                ret = False
-            return ret
-        except Error as e:
-            logging.error(f"Error in is_photo_catalog_unique {str(e)}")
-            return None
-
-    @staticmethod
     def is_photo_users_unique(file_hash):
         """Проверяет, есть ли уже такое фото у пользователя"""
         try:
@@ -335,21 +317,6 @@ class ManageQuery:
         return ret
 
     @staticmethod
-    def add_hash_photos_clothes_catalog(id_clothes, hash):
-        ret = False
-
-        try:
-            query = """
-                    INSERT INTO hash_photos_catalog(id_clothes, hash)
-                    VALUES (%s, %s)
-            """
-            ManageQuery._execute_query(query, (id_clothes, hash))
-            ret = True
-        except Error as e:
-            logging.error(f"Error add_hash_photos_catalog {str(e)}")
-        return ret
-
-    @staticmethod
     def add_hash_photos_users(id_photo, hash):
         ret = False
 
@@ -410,22 +377,6 @@ class ManageQuery:
             return False
 
     @staticmethod
-    def delete_hash_photos_catalog(id_clothes):
-        try:
-            query = """
-                    DELETE FROM hash_photos_catalog
-                    WHERE id_clothes = %s RETURNING id_clothes
-            """
-            result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
-
-            if not result:
-                result = None
-            return result
-        except Error as e:
-            logging.error(f"Error delete hash photos catalog {str(e)}")
-            return False
-
-    @staticmethod
     def delete_photo_clothes(id_clothes):  # Мягкое удаление фото одежды из базы данных
         if not id_clothes:
             logging.error("id clothes is empty")
@@ -450,38 +401,6 @@ class ManageQuery:
             result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
 
             if result and ManageQuery.delete_hash_photos_clothes(id_clothes):
-                return {'status': 'success', 'id': result[0]}
-            return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
-
-        except Error as e:
-            logging.error(f"Error delete photo clothes: {str(e)}")
-            return {'status': 'error', 'message': f'Ошибка базы данных: {str(e)}'}
-
-    @staticmethod
-    def delete_photo_clothes_catalog(id_clothes):  # Мягкое удаление фото одежды из каталога
-        if not id_clothes:
-            logging.error("id clothes is empty")
-            return {'status': 'error', 'message': 'ID одежды не указан'}
-
-        try:
-            # Проверяем существование записи
-            if not ManageQuery.exist_id_clothes(id_clothes):
-                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} не найдена'}
-
-            # Проверяем, не удалена ли уже запись
-            if ManageQuery.is_clothes_deleted(id_clothes):
-                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} уже удалена'}
-
-            # Выполняем мягкое удаление
-            query = """
-                UPDATE photo_clothes
-                SET deleted_at = CURRENT_TIMESTAMP
-                WHERE id_clothes = %s
-                RETURNING id_clothes
-            """
-            result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
-
-            if result and ManageQuery.delete_hash_photos_catalog(id_clothes):
                 return {'status': 'success', 'id': result[0]}
             return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
 
@@ -549,6 +468,3 @@ class ManageQuery:
             return result
         except Error as e:
             logging.error(f"Error exist id clothes {str(e)}")
-
-    # @staticmethod
-    # def
