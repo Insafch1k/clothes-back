@@ -258,3 +258,37 @@ def try_on_clothes(user_name, id_clothes):
 
     except Exception as error:
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
+
+@clothes_blueprint.route("admin/catalog", methods=["GET"])
+def get_admin_clothes_catalog():
+    """
+    Возвращает список одежды, добавленной администратором, с поддержкой пагинации.
+    """
+    try:
+        page = request.args.get("page", default=1, type=int)
+        limit = request.args.get("limit", default=20, type=int)
+
+        if page < 1 or limit < 1:
+            return jsonify({"error": "page and limit must be >= 1"}), 400
+
+        clothes_list = ManageQuery.get_admin_clothes(limit=limit, offset=offset)
+
+        if not clothes_list:
+            return jsonify({"error":"Одежда, добавленная администратором, не найдена"}), 404
+
+        for i in range(len(clothes_list)):
+            clothes_list[i] = Base64Utils.encode_to_base64(clothes_list[i])
+
+        return jsonify({
+            "status": "success",
+            "message": f"Найдено {len(clothes_list)} элементов",
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total_items": ManageQuery.count_admin_clothes()
+            },
+            "clothes": clothes_list
+        }), 200
+
+    except Exception as error:
+        return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500

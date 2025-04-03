@@ -535,3 +535,43 @@ class ManageQuery:
             return result
         except Error as e:
             logging.error(f"Error get path clothes {str(e)}")
+
+    @staticmethod
+    def get_admin_clothes(limit=20, offset=0):
+        """
+        Возвращает список одежды, добавленной администратором.
+        """
+        try:
+            query = """"
+                SELECT id, user_name, photo_path, category, subcategory, sub_subcategory
+                FROM photo_clothes
+                WHERE is_admin_added = TRUE
+                LIMIT %s OFFSET %s
+            """
+            result = ManageQuery._execute_query(query, (limit, offset), fetch=True)
+            if not result:
+                result = None
+            else:
+                for i in range(len(result)):
+                    result[i] = result[i][0]
+        except  Error as e:
+            logging.error(f"Error get_admin_clothes {str(e)}")
+            return None
+
+        @staticmethod
+        def count_admin_clothes():
+            """
+            Подсчитывает количество элементов одежды, добавленных администратором.
+            """
+            try:
+                query = """"
+                        SELECT COUNT(*) FROM photo_clothes
+                        WHERE is_admin_added = TRUE
+                """
+                result = ManageQuery._execute_query(query, fetch=True)
+                if not result:
+                    result = None
+                return result[0][0]
+            except Error as e:
+                logging.error(f"Error count user photos {str(e)}")
+
