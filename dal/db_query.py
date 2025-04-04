@@ -599,36 +599,93 @@ class ManageQuery:
         Возвращает список одежды, добавленной администратором.
         """
         try:
-            query = """"
-                SELECT id, user_name, photo_path, category, subcategory, sub_subcategory
+            query = """
+                SELECT id_clothes, photo_path, id_category, id_subcategory, id_sub_subcategory
                 FROM photo_clothes
-                WHERE is_admin_added = TRUE
+                WHERE id_user = %s
                 LIMIT %s OFFSET %s
             """
-            result = ManageQuery._execute_query(query, (limit, offset), fetch=True)
+            result = ManageQuery._execute_query(query, (os.getenv("ADMIN_LIST"), limit, offset), fetch=True)
             if not result:
                 result = None
-            else:
-                for i in range(len(result)):
-                    result[i] = result[i][0]
+            return result
         except  Error as e:
             logging.error(f"Error get_admin_clothes {str(e)}")
             return None
 
-        @staticmethod
-        def count_admin_clothes():
+    @staticmethod
+    def count_admin_clothes():
+        """
+        Подсчитывает количество элементов одежды, добавленных администратором.
+        """
+        try:
+            query = """
+                    SELECT COUNT(*) FROM photo_clothes
+                    WHERE is_admin_added = TRUE
             """
-            Подсчитывает количество элементов одежды, добавленных администратором.
-            """
-            try:
-                query = """"
-                        SELECT COUNT(*) FROM photo_clothes
-                        WHERE is_admin_added = TRUE
-                """
-                result = ManageQuery._execute_query(query, fetch=True)
-                if not result:
-                    result = None
-                return result[0][0]
-            except Error as e:
-                logging.error(f"Error count user photos {str(e)}")
+            result = ManageQuery._execute_query(query, fetch=True)
+            if not result:
+                result = None
+            return result[0][0]
+        except Error as e:
+            logging.error(f"Error count user photos {str(e)}")
 
+    @staticmethod
+    def get_name_category(id_category):
+        """
+        Возвращает название категории по её id.
+        """
+        try:
+            query = """
+                SELECT category FROM category_clothes 
+                WHERE id_category = %s
+            """
+            result = ManageQuery._execute_query(query, (id_category,), fetch=True)
+            if not result:
+                result = None
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error get id category_photos {str(e)}")
+            return None
+
+    @staticmethod
+    def get_name_subcategory(id_subcategory):
+        """
+        Возвращает название подкатегории по её id.
+        """
+        try:
+            query = """
+                SELECT subcategory FROM subcategory_clothes 
+                WHERE id_subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, (id_subcategory,), fetch=True)
+            if not result:
+                result = None
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error get id subcategory_photos {str(e)}")
+            return None
+
+    @staticmethod
+    def get_name_sub_subcategory(id_sub_subcategory):
+        """
+        Возвращает название под-подкатегории по её id.
+        """
+        try:
+            query = """
+                SELECT sub_subcategory FROM sub_subcategory_clothes 
+                WHERE id_sub_subcategory = %s
+            """
+            result = ManageQuery._execute_query(query, (id_sub_subcategory,), fetch=True)
+            if not result:
+                result = None
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error get id sub_subcategory_photos {str(e)}")
+            return None
