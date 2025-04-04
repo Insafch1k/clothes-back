@@ -599,31 +599,47 @@ class ManageQuery:
         Возвращает список одежды, добавленной администратором.
         """
         try:
-            query = """
+            # Получаем список ID админов из .env
+            admin_list = tuple(map(int, os.getenv("ADMIN_LIST", "").split(",")))
+            if not admin_list:
+                return None
+
+            # Формируем placeholders для IN (%s, %s, ...)
+            placeholders = ', '.join(['%s'] * len(admin_list))
+
+            query = f"""
                 SELECT id_clothes, photo_path, id_category, id_subcategory, id_sub_subcategory
                 FROM photo_clothes
-                WHERE id_user = %s
+                WHERE id_user IN ({placeholders})
                 LIMIT %s OFFSET %s
             """
-            result = ManageQuery._execute_query(query, (os.getenv("ADMIN_LIST"), limit, offset), fetch=True)
-            if not result:
-                result = None
-            return result
-        except  Error as e:
+
+            # Объединяем параметры: сначала ID админов, потом limit и offset
+            params = admin_list + (limit, offset)
+
+            result = ManageQuery._execute_query(query, params, fetch=True)
+            return result if result else None
+
+        except Error as e:
             logging.error(f"Error get_admin_clothes {str(e)}")
             return None
 
     @staticmethod
     def count_admin_clothes():
         """
-        Подсчитывает количество элементов одежды, добавленных администратором.
+        Подсчитывает количество элементов одежды, добавленных администраторами (по id_user).
         """
         try:
-            query = """
-                    SELECT COUNT(*) FROM photo_clothes
-                    WHERE is_admin_added = TRUE
+            admin_list = tuple(map(int, os.getenv("ADMIN_LIST", "").split(",")))
+            if not admin_list:
+                return 0  # если переменная пустая, возвращаем 0
+
+            placeholders = ', '.join(['%s'] * len(admin_list))
+            query = f"""
+                SELECT COUNT(*) FROM photo_clothes
+                WHERE id_user IN ({placeholders})
             """
-            result = ManageQuery._execute_query(query, fetch=True)
+            result = ManageQuery._execute_query(query, admin_list, fetch=True)
             if not result:
                 result = None
             return result[0][0]
