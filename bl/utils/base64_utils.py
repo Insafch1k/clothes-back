@@ -1,11 +1,7 @@
 import base64
 import os
 import uuid
-
-from flask import jsonify
-from bl.clothes_bl.clothes_bl import UPLOAD_FOLDER as UPLOAD_FOLDER_CLOTHES
-from bl.clothes_bl.clothes_bl import UPLOAD_FOLDER_CATALOG
-from bl.background_bl.background_bl import UPLOAD_FOLDER as UPLOAD_FOLDER_BACKGROUND
+import config
 
 
 class Base64Utils:
@@ -44,7 +40,7 @@ class Base64Utils:
         Декодирует строку Base64 и возвращает фото.
 
         :param base64_string: Строка Base64 для декодирования.
-        :return: фото
+        :return: Фото
         """
         try:
             # Удаляем префикс, если он есть (например, "data:image/png;base64,")
@@ -69,7 +65,7 @@ class Base64Utils:
     def writing_file_clothes(photo_base64):
         # Генерируем уникальное имя файла
         filename = f"{uuid.uuid4().hex}.png"
-        input_path = os.path.join(UPLOAD_FOLDER_CLOTHES, filename)
+        input_path = os.path.join(config.UPLOAD_FOLDER_CLOTHES, filename)
 
         # Декодируем base64 и сохраняем изображение
         try:
@@ -82,7 +78,7 @@ class Base64Utils:
     def writing_file_clothes_catalog(photo_base64):
         # Генерируем уникальное имя файла
         filename = f"{uuid.uuid4().hex}.png"
-        input_path = os.path.join(UPLOAD_FOLDER_CATALOG, filename)
+        input_path = os.path.join(config.UPLOAD_FOLDER_CATALOG, filename)
 
         # Декодируем base64 и сохраняем изображение
         try:
@@ -95,7 +91,7 @@ class Base64Utils:
     def writing_file_background(photo_base64):
         # Генерируем уникальное имя файла
         filename = f"{uuid.uuid4().hex}.png"
-        input_path = os.path.join(UPLOAD_FOLDER_BACKGROUND, filename)
+        input_path = os.path.join(config.UPLOAD_FOLDER_BACKGROUND, filename)
 
         # Декодируем base64 и сохраняем изображение
         try:

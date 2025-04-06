@@ -7,7 +7,7 @@ import os
 
 class CheckArgs:
     @staticmethod
-    def check_args_add_photo_clothes(id_user, id_category, id_subcategory, id_sub_subcategory, user_name, category,
+    def check_args_add_photo_clothes_db(id_user, id_category, id_subcategory, id_sub_subcategory, user_name, category,
                                      subcategory,
                                      sub_subcategory,
                                      photo_path):
@@ -43,8 +43,12 @@ class CheckArgs:
             ret = False
         return ret
 
+    # @staticmethod
+    # def check_args_add_photo_clothes():
+
+
     @staticmethod
-    def check_args_add_photos_in_catalog(photo_base64, user_name, category, subcategory, sub_subcategory):
+    def check_args_add_photo_clothes(photo_base64, user_name, category, subcategory, sub_subcategory):
         ret = {
             "status": "success"
         }
@@ -73,9 +77,9 @@ class CheckArgs:
                 "status": "error",
                 "error": "Отсутствует параметр sub_subcategory"
             }
-        is_admin = CheckArgs.check_is_admin(user_name)
-        if is_admin["status"] == "error":
-            ret = is_admin
+        # is_admin = CheckArgs.check_is_admin(user_name)
+        # if is_admin["status"] == "error":
+        #     ret = is_admin
         return ret
 
     @staticmethod

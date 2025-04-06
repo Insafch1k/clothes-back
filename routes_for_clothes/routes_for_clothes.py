@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from bl.utils.base64_utils import Base64Utils
-from bl.clothes_bl.clothes_bl import remove_background_clothes, UPLOAD_FOLDER, PROCESSED_FOLDER, UPLOAD_FOLDER_CATALOG, \
+from bl.clothes_bl.clothes_bl import remove_background_clothes, UPLOAD_FOLDER, PROCESSED_FOLDER, \
     PROCESSED_FOLDER_CATALOG, remove_background_clothes_catalog
 from dal.db_query import ManageQuery
 from bl.utils.hash import calculate_hash
@@ -233,6 +233,7 @@ def get_clothes_from_catalog(category, sub_subcategory):
     except Exception as error:
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
 
+
 @clothes_blueprint.route("/catalog/add_photos", methods=["POST"])
 def add_photos_in_catalog():
     """
@@ -353,7 +354,6 @@ def delete_photo_clothes_catalog(id_clothes):
         }), 500
 
 
-
 @clothes_blueprint.route("/try_on/<user_name>/<id_clothes>", methods=["GET"])
 def try_on_clothes(user_name, id_clothes):
     """
@@ -383,6 +383,7 @@ def try_on_clothes(user_name, id_clothes):
     except Exception as error:
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
 
+
 @clothes_blueprint.route("/catalog", methods=["GET"])
 def get_admin_clothes_catalog():
     """
@@ -400,7 +401,7 @@ def get_admin_clothes_catalog():
         clothes_list = ManageQuery.get_admin_clothes(limit=limit, offset=offset)
 
         if not clothes_list:
-            return jsonify({"error":"Одежда, добавленная администратором, не найдена"}), 404
+            return jsonify({"error": "Одежда, добавленная администратором, не найдена"}), 404
 
         dates = [
             {

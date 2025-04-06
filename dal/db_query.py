@@ -402,7 +402,7 @@ class ManageQuery:
             id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
             id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
 
-            if CheckArgs.check_args_add_photo_clothes(id_user, id_category, id_subcategory, id_sub_subcategory,
+            if CheckArgs.check_args_add_photo_clothes_db(id_user, id_category, id_subcategory, id_sub_subcategory,
                                                       user_name,
                                                       category, subcategory,
                                                       sub_subcategory, photo_path):

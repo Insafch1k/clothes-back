@@ -2,20 +2,16 @@ from flask import Blueprint, request, jsonify, send_from_directory
 import os
 import uuid
 from bl.utils.base64_utils import Base64Utils
-from bl.background_bl.background_bl import remove_background, UPLOAD_FOLDER, PROCESSED_FOLDER
+from bl.background_bl.background_bl import remove_background
+import config
+from bl.utils.create_folders import create_folders_for_background
 from bl.utils.hash import calculate_hash
+from config import PROCESSED_FOLDER_BACKGROUND
 from dal.db_query import ManageQuery
-
-# comment
-
 
 background_blueprint = Blueprint("background_blueprint", __name__)
 
-# Проверка и создание необходимых папок
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-if not os.path.exists(PROCESSED_FOLDER):
-    os.makedirs(PROCESSED_FOLDER)
+create_folders_for_background()
 
 
 @background_blueprint.route("/process", methods=["POST"])
@@ -43,7 +39,7 @@ def upload_file():
         if not ManageQuery.is_photo_users_unique(file_hash):
             return jsonify({"error": "Photo already exists"}), 400
 
-        # Генерируем уникальное имя файла
+        # Генерируем уникальное имя файла.
         # Декодируем base64 и сохраняем изображение
         try:
             input_path = Base64Utils.writing_file_background(photo_base64)
@@ -59,7 +55,7 @@ def upload_file():
 
         if output_filename:
             # Путь к обработанному изображению
-            processed_path = os.path.join(PROCESSED_FOLDER, output_filename)
+            processed_path = os.path.join(PROCESSED_FOLDER_BACKGROUND, output_filename)
 
             # Сохраняем информацию о фотографии пользователя
             try:
@@ -125,7 +121,7 @@ def get_processed_image(filename):
     """
     Возвращает обработанное изображение по ссылке.
     """
-    return send_from_directory(PROCESSED_FOLDER, filename)
+    return send_from_directory(PROCESSED_FOLDER_BACKGROUND, filename)
 
 
 @background_blueprint.route("/user_photos/<user_name>", methods=["GET"])
