@@ -56,7 +56,7 @@ def remove_background_clothes_catalog(input_path):
 #     }
 #     return data
 
-def get_data_from_json(data):
+def get_data_from_json_add_photos(data):
     photo_base64 = data.get("image")
     user_name = data.get("user_name")
     category = data.get("category")
@@ -64,6 +64,13 @@ def get_data_from_json(data):
     sub_subcategory = data.get("sub_subcategory")
 
     return photo_base64, user_name, category, subcategory, sub_subcategory
+
+
+def get_data_from_json_recovery_photos(data):
+    id_clothes = data.get("id_clothes")
+    user_name = data.get("user_name")
+
+    return id_clothes, user_name
 
 
 def process_photo_common(photo_base64, writing_func, remove_bg_func, processed_folder):

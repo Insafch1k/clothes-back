@@ -8,9 +8,9 @@ import os
 class CheckArgs:
     @staticmethod
     def check_args_add_photo_clothes_db(id_user, id_category, id_subcategory, id_sub_subcategory, user_name, category,
-                                     subcategory,
-                                     sub_subcategory,
-                                     photo_path):
+                                        subcategory,
+                                        sub_subcategory,
+                                        photo_path):
         ret = True
         if id_user is None:
             logging.error(f"User '{user_name}' not found")
@@ -46,7 +46,6 @@ class CheckArgs:
     # @staticmethod
     # def check_args_add_photo_clothes():
 
-
     @staticmethod
     def check_args_add_photo_clothes(photo_base64, user_name, category, subcategory, sub_subcategory):
         ret = {
@@ -81,6 +80,44 @@ class CheckArgs:
         # if is_admin["status"] == "error":
         #     ret = is_admin
         return ret
+
+    @staticmethod
+    def check_args_recovery_photos(id_clothes, user_name):
+        ret = {
+            "status": "success"
+        }
+        if not id_clothes:
+            ret = {
+                "status": "error",
+                "error": "Отсутствует параметр id"
+            }
+        if not user_name:
+            ret = {
+                "status": "error",
+                "error": "Отсутствует параметр user_name"
+            }
+        return ret
+
+    @staticmethod
+    def check_args_recovery_photos_wardrobe(id_clothes, user_name):
+        # Проверка необходимых данных
+        result = CheckArgs.check_args_recovery_photos(id_clothes, user_name)
+        if result["status"] == "error":
+            return result
+
+        id_user = dal.db_query.ManageQuery.get_id_user(user_name)
+        if id_user is None:
+            return {
+                "status": "error",
+                "error": f"user_name '{user_name}' не найден"
+            }
+
+        if not dal.db_query.ManageQuery.is_photo_clothes_deleted(id_clothes):
+            return {
+                "status": "error",
+                "error": f"Фото одежды с id {id_clothes} не удалено"
+            }
+        return result
 
     @staticmethod
     def check_is_admin(user_name):
