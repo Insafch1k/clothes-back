@@ -148,7 +148,9 @@ class ManageQuery:
 
     @staticmethod
     def is_photo_user_deleted(id_photo) -> bool:
-        """Проверяет, удалена ли уже запись"""
+        """
+        Проверяет, удалено ли фото пользователя
+        """
         try:
             query = """
                 SELECT id_photo FROM photo_users
@@ -158,6 +160,22 @@ class ManageQuery:
             return bool(result)
         except Error as e:
             logging.error(f"Error in is photo user deleted: {str(e)}")
+            return False
+
+    @staticmethod
+    def is_photo_clothes_deleted(id_clothes) -> bool:
+        """
+        Проверяет, удалено ли фото одежды
+        """
+        try:
+            query = """
+                SELECT id_clothes FROM photo_clothes
+                WHERE id_clothes = %s AND deleted_at IS NOT NULL
+            """
+            result = ManageQuery._execute_query(query, id_clothes, fetch=True)
+            return bool(result)
+        except Error as e:
+            logging.error(f"Error in is photo clothes deleted: {str(e)}")
             return False
 
     @staticmethod
@@ -403,9 +421,9 @@ class ManageQuery:
             id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
 
             if CheckArgs.check_args_add_photo_clothes_db(id_user, id_category, id_subcategory, id_sub_subcategory,
-                                                      user_name,
-                                                      category, subcategory,
-                                                      sub_subcategory, photo_path):
+                                                         user_name,
+                                                         category, subcategory,
+                                                         sub_subcategory, photo_path):
                 query = """
                         INSERT INTO photo_clothes (id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut)
                         VALUES (%s, %s, %s, %s, %s, %s) returning id_clothes
@@ -705,3 +723,25 @@ class ManageQuery:
         except Error as e:
             logging.error(f"Error get id sub_subcategory_photos {str(e)}")
             return None
+
+    @staticmethod
+    def recovery_photos_wardrobe_db(id_clothes, id_user):
+        """
+        Восстанавливает удалённое фото одежды из гардероба
+        :param id_clothes:
+        :param id_user:
+        :return:
+        """
+        try:
+            query = """
+                    UPDATE photo_clothes
+                    SET deleted_at = NULL
+                    WHERE id_clothes = %s AND id_user = %s
+                    RETURNING id_clothes
+            """
+            result = ManageQuery._execute_query(query, (id_clothes, id_user), fetch_insert=True)
+            if result:
+                return {'status': 'success', 'id': result[0]}
+            return {'status': 'error', 'message': 'Не удалось выполнить восстановление фото одежды из гардероба'}
+        except Error as e:
+            logging.error(f"Error recovery_photos_wardrobe_db {str(e)}")

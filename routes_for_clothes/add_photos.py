@@ -19,7 +19,7 @@ def process_clothes():
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
     """
     # Получаем данные из JSON
-    photo_base64, user_name, category, subcategory, sub_subcategory = clothes_bl.get_data_from_json(request.json)
+    photo_base64, user_name, category, subcategory, sub_subcategory = clothes_bl.get_data_from_json_add_photos(request.json)
 
     # Проверка необходимых данных
     result = CheckArgs.check_args_add_photo_clothes(photo_base64, user_name, category, subcategory,
@@ -105,7 +105,7 @@ def process_clothes():
         return jsonify({
             "status": "success",
             "message": "Фон успешно удален",
-            "image_base64": f"data:image/png;base64,{encode_image}"
+            # "image_base64": f"data:image/png;base64,{encode_image}"
         })
     except Exception as error:
         return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
@@ -118,7 +118,7 @@ def add_photos_in_catalog():
     :return: JSON с результатом операции
     """
     # Получаем данные из JSON
-    photo_base64, user_name, category, subcategory, sub_subcategory = clothes_bl.get_data_from_json(request.json)
+    photo_base64, user_name, category, subcategory, sub_subcategory = clothes_bl.get_data_from_json_add_photos(request.json)
 
     # Проверка необходимых данных
     result = CheckArgs.check_args_add_photo_clothes(photo_base64, user_name, category, subcategory,
@@ -210,7 +210,7 @@ def add_photos_in_catalog():
         return jsonify({
             "status": "success",
             "message": "Фон успешно удален",
-            "image_base64": f"data:image/png;base64,{encode_image}"
+            # "image_base64": f"data:image/png;base64,{encode_image}"
         })
     except Exception as error:
         return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
