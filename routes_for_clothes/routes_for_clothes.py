@@ -137,8 +137,8 @@ def get_processed_image(filename):
     return send_from_directory(PROCESSED_FOLDER, filename)
 
 
-@clothes_blueprint.route("/wardrobe/<user_name>/<category>/<sub_subcategory>", methods=["GET"])
-def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
+@clothes_blueprint.route("/wardrobe/<user_name>/<category>/<subcategory>/<sub_subcategory>", methods=["GET"])
+def get_clothes_from_wardrobe(user_name, category, subcategory, sub_subcategory):
     """
     Возвращает список одежды из гардероба по указанной категории и под подкатегории.
     """
@@ -156,6 +156,10 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
         if id_category is None:
             return jsonify({"error": f"Категория '{category}' не найдена"}), 404
 
+        id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
+        if id_subcategory is None:
+            return jsonify({"error": f"Подкатегория '{subcategory}' не найдена"}), 404
+
         id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
         if id_sub_subcategory is None:
             return jsonify({"error": f"Подподкатегории '{sub_subcategory}' не найдена"}), 404
@@ -163,18 +167,20 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
         offset = (page - 1) * limit
 
         clothes_list = ManageQuery.get_clothes_from_wardrobe_paginated(id_user=id_user, id_category=id_category,
+                                                                       id_subcategory=id_subcategory,
                                                                        id_sub_subcategory=id_sub_subcategory,
                                                                        limit=limit, offset=offset)
         if not clothes_list:
             return jsonify(
-                {"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
+                {
+                    "error": f"Одежда в категории '{category}', в подкатегории {subcategory} и в подподкатегори '{sub_subcategory}' не найдена"}), 404
 
         for i in range(len(clothes_list)):
             clothes_list[i] = Base64Utils.encode_to_base64(clothes_list[i])
 
         return jsonify({
             "status": "success",
-            "message": f"Найдено {len(clothes_list)} элементов в категории '{category}' и подкатегории '{sub_subcategory}'",
+            "message": f"Найдено {len(clothes_list)} элементов в категории '{category}', в подкатегории {subcategory} и подкатегории '{sub_subcategory}'",
             "pagination": {
                 "page": page,
                 "limit": limit,
@@ -187,8 +193,8 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
 
 
-@clothes_blueprint.route("/catalog/<category>/<sub_subcategory>", methods=["GET"])
-def get_clothes_from_catalog(category, sub_subcategory):
+@clothes_blueprint.route("/catalog/<category>/<subcategory>/<sub_subcategory>", methods=["GET"])
+def get_clothes_from_catalog(category, subcategory, sub_subcategory):
     """
     Возвращает список одежды из каталога по указанной категории и под подкатегории.
     """
@@ -203,6 +209,10 @@ def get_clothes_from_catalog(category, sub_subcategory):
         if id_category is None:
             return jsonify({"error": f"Категория '{category}' не найдена"}), 404
 
+        id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
+        if id_subcategory is None:
+            return jsonify({"error": f"Подкатегория '{subcategory}' не найдена"}), 404
+
         id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
         if id_sub_subcategory is None:
             return jsonify({"error": f"Подподкатегории '{sub_subcategory}' не найдена"}), 404
@@ -210,11 +220,13 @@ def get_clothes_from_catalog(category, sub_subcategory):
         offset = (page - 1) * limit
 
         clothes_list = ManageQuery.get_clothes_from_catalog_paginated(id_category=id_category,
+                                                                      id_subcategory=id_subcategory,
                                                                       id_sub_subcategory=id_sub_subcategory,
                                                                       limit=limit, offset=offset)
         if not clothes_list:
             return jsonify(
-                {"error": f"Одежда в категории '{category}' и в подподкатегори '{sub_subcategory}' не найдена"}), 404
+                {
+                    "error": f"Одежда в категории '{category}', в подкатегории {subcategory} и в подподкатегори '{sub_subcategory}' не найдена"}), 404
 
         for i in range(len(clothes_list)):
             clothes_list[i] = Base64Utils.encode_to_base64(clothes_list[i])

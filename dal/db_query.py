@@ -302,16 +302,17 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def get_clothes_from_wardrobe_paginated(id_user, id_category,
+    def get_clothes_from_wardrobe_paginated(id_user, id_category, id_subcategory,
                                             id_sub_subcategory, limit=20,
                                             offset=0):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
         try:
             query = """
                      SELECT photo_path FROM photo_clothes
-                     WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s
+                     WHERE id_user = %s AND id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s
                      LIMIT %s OFFSET %s
              """
-            result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory, limit, offset), True)
+            result = ManageQuery._execute_query(query, (
+                id_user, id_category, id_subcategory, id_sub_subcategory, limit, offset), True)
             if not result:
                 result = None
             else:
@@ -319,11 +320,11 @@ class ManageQuery:
                     result[i] = result[i][0]
             return result
         except Error as e:
-            logging.error(f"Error get id subcategory_clothes {str(e)}")
+            logging.error(f"Error get_clothes_from_wardrobe_paginated {str(e)}")
             return None
 
     @staticmethod
-    def get_clothes_from_catalog_paginated(id_category, id_sub_subcategory, limit=20, offset=0):
+    def get_clothes_from_catalog_paginated(id_category, id_subcategory, id_sub_subcategory, limit=20, offset=0):
         """
         Возвращает список одежды из каталога по указанной категории и подподкатегории.
         """
@@ -331,9 +332,10 @@ class ManageQuery:
             query = """
                 SELECT photo_path
                 FROM photo_clothes
-                WHERE id_category = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
+                WHERE id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
             """
-            result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory, limit, offset), fetch=True)
+            result = ManageQuery._execute_query(query, (id_category, id_subcategory, id_sub_subcategory, limit, offset),
+                                                fetch=True)
             if not result:
                 result = None
             else:
