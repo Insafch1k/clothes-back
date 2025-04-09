@@ -157,21 +157,21 @@ def validate_and_get_id(source, user_name, category, sub_subcategory):
         return {"error": f"Ошибка в валидации: {str(e)}"}, 500
 
 
-def fetch_clothes(source, id_user, id_category, id_sub_subcategory, limit, offset):
+def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcategory, limit, offset):
     try:
         if source == "wardrobe":
             clothes = ManageQuery.get_clothes_from_wardrobe_paginated(
-                id_user=id_user, id_category=id_category, id_sub_subcategory=id_sub_subcategory,
+                id_user=id_user, id_category=id_category, id_subcategory=id_subcategory, id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
-            total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_sub_subcategory)
+            total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory)
 
         elif source == "catalog":
             clothes = ManageQuery.get_clothes_from_catalog_paginated(
-                id_category=id_category, id_sub_subcategory=id_sub_subcategory,
+                id_category=id_category, id_subcategory=id_subcategory, id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
-            total = ManageQuery.count_clothes_in_catalog(id_category, id_sub_subcategory)
+            total = ManageQuery.count_clothes_in_catalog(id_category, id_subcategory, id_sub_subcategory)
 
         else:
             logging.error(f"Invalid source: {source}")
@@ -215,4 +215,6 @@ def get_clothes_by_type(source, user_name, category, sub_subcategory, page, limi
 
     except Exception as error:
         return jsonify({"error": f"Ошибка получения одежды: {str(error)}"}), 500
+
+
 

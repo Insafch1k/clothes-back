@@ -4,8 +4,8 @@ from bl.clothes_bl import clothes_bl
 get_wardrobe_catalog = Blueprint("get_wardrobe_catalog", __name__)
 
 
-@get_wardrobe_catalog.route("/wardrobe/<user_name>/<category>/<sub_subcategory>", methods=["GET"])
-def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
+@get_wardrobe_catalog.route("/wardrobe/<user_name>/<category>/<subcategory>/<sub_subcategory>", methods=["GET"])
+def get_clothes_from_wardrobe(user_name, category, subcategory, sub_subcategory):
     """
     Возвращает список одежды из гардероба по категории и подподкатегории.
     """
@@ -22,6 +22,7 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
             source="wardrobe",
             user_name=user_name,
             category=category,
+            subcategory=subcategory,
             sub_subcategory=sub_subcategory,
             page=page,
             limit=limit
@@ -31,8 +32,8 @@ def get_clothes_from_wardrobe(user_name, category, sub_subcategory):
     except Exception as error:
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
 
-@get_wardrobe_catalog.route("/catalog/<category>/<sub_subcategory>", methods=["GET"])
-def get_clothes_from_catalog(category, sub_subcategory):
+@get_wardrobe_catalog.route("/catalog/<category>/<subcategory>/<sub_subcategory>", methods=["GET"])
+def get_clothes_from_catalog(category, subcategory, sub_subcategory):
     """
     Возвращает список одежды из каталога по указанной категории и под подкатегории.
     """
@@ -48,6 +49,7 @@ def get_clothes_from_catalog(category, sub_subcategory):
             source="catalog",
             user_name=None,
             category=category,
+            subcategory=subcategory,
             sub_subcategory=sub_subcategory,
             page=page,
             limit=limit
