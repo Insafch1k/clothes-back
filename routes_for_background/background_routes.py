@@ -9,7 +9,7 @@ from bl.utils.hash import calculate_hash
 from config import PROCESSED_FOLDER_BACKGROUND
 from dal.db_query import ManageQuery
 
-background_blueprint = Blueprint("background_blueprint", __name__)
+# background_blueprint = Blueprint("background_blueprint", __name__)
 
 # create_folders_for_background()
 

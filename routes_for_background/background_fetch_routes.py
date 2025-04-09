@@ -2,10 +2,10 @@ from flask import Blueprint, request, jsonify
 from dal.db_query import ManageQuery
 from bl.utils.base64_utils import Base64Utils
 
-get_user_photos = Blueprint("get_user_photos", __name__)
+get_photos = Blueprint("get_photos", __name__)
 
 
-@get_user_photos.route("/user_photos/<user_name>", methods=["GET"])
+@get_photos.route("/user_photos/<user_name>", methods=["GET"])
 def get_user_photos(user_name):  # user_name из URL!
     # Пагинация — в query-параметрах
     page = request.args.get("page", default=1, type=int)
