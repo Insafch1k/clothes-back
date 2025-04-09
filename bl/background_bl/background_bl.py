@@ -21,3 +21,10 @@ def remove_background(input_path):
     except Exception as error:
         print(f"Ошибка обработки изображения: {error}")
         return None
+
+
+def get_data_from_json_recovery_photos_human(data):
+    id_photo = data.get("id_photo")
+    user_name = data.get("user_name")
+
+    return id_photo, user_name

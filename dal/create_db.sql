@@ -14,7 +14,7 @@ CREATE TABLE Category_photos (
 -- Таблица хэшей фото пользователей
 CREATE TABLE hash_photos_users (
     id_photo SERIAL PRIMARY KEY,
-    hash TEXT NOT NULL UNIQUE
+    hash TEXT NOT NULL
 );
 
 -- Создание таблицы Photo_users
@@ -48,7 +48,7 @@ CREATE TABLE Sub_subcategory_clothes (
 -- Таблица хэшей фото одежды
 CREATE TABLE hash_photos_clothes (
     id_clothes SERIAL PRIMARY KEY,
-    hash TEXT NOT NULL UNIQUE
+    hash TEXT NOT NULL
 );
 
 -- Таблица хэшей фото каталога

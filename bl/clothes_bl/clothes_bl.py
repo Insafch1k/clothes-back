@@ -166,7 +166,8 @@ def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcatego
     try:
         if source == "wardrobe":
             clothes = ManageQuery.get_clothes_from_wardrobe_paginated(
-                id_user=id_user, id_category=id_category, id_subcategory=id_subcategory, id_sub_subcategory=id_sub_subcategory,
+                id_user=id_user, id_category=id_category, id_subcategory=id_subcategory,
+                id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
             total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory)
@@ -221,6 +222,3 @@ def get_clothes_by_type(source, user_name, category, subcategory, sub_subcategor
 
     except Exception as error:
         return jsonify({"error": f"Ошибка получения одежды: {str(error)}"}), 500
-
-
-
