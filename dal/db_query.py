@@ -138,7 +138,8 @@ class ManageQuery:
             """
             result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
 
-            if result and ManageQuery.delete_hash_photos_users(id_photo):
+            # if result and ManageQuery.delete_hash_photos_users(id_photo):
+            if result:
                 return {'status': 'success', 'id': result[0]}
             return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
 
@@ -195,15 +196,17 @@ class ManageQuery:
             logging.error(f"Error exist id photo {str(e)}")
 
     @staticmethod
-    def is_photo_clothes_unique(file_hash):
-        """Проверяет, есть ли уже такое фото одежды у пользователя"""
+    def is_photo_clothes_unique(file_hash, id_user):
+        """Проверяет, есть ли уже такое фото одежды у пользователя среди неудалённых"""
         try:
             query = """
-                SELECT id_clothes FROM hash_photos_clothes 
-                WHERE hash = %s
+                SELECT h.id_clothes FROM hash_photos_clothes AS h
+                JOIN photo_clothes AS p
+                ON h.id_clothes = p.id_clothes
+                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NULL
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, file_hash, True)
+            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
             ret = True
             if result:
                 ret = False
@@ -213,15 +216,38 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def is_photo_catalog_unique(file_hash):
-        """Проверяет, есть ли уже такое фото одежды в каталоге"""
+    def is_photo_clothes_among_deleted(file_hash, id_user):
+        """Проверяет, есть ли уже такое фото в гардеробе среди удалённых"""
         try:
             query = """
-                SELECT id_clothes FROM hash_photos_catalog
-                WHERE hash = %s
+                SELECT h.id_photo FROM hash_photos_clothes AS h
+                JOIN photo_clothes AS p
+                ON h.id_clothes = p.id_clothes
+                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NOT NULL
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, file_hash, True)
+            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
+            if not result:
+                result = False
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error in is_photo_clothes_among_deleted {str(e)}")
+            return None
+
+    @staticmethod
+    def is_photo_catalog_unique(file_hash, id_user):
+        """Проверяет, есть ли уже такое фото одежды в каталоге среди неудалённых"""
+        try:
+            query = """
+                SELECT h.id_clothes FROM hash_photos_catalog AS h
+                JOIN photo_clothes AS p
+                ON h.id_clothes = p.id_clothes
+                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NULL
+                LIMIT 1
+            """
+            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
             ret = True
             if result:
                 ret = False
@@ -231,21 +257,65 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def is_photo_users_unique(file_hash):
-        """Проверяет, есть ли уже такое фото у пользователя"""
+    def is_photo_catalog_among_deleted(file_hash, id_user):
+        """Проверяет, есть ли уже такое фото в каталоге среди удалённых"""
         try:
             query = """
-                SELECT id_photo FROM hash_photos_users 
-                WHERE hash = %s
+                SELECT h.id_photo FROM hash_photos_catalog AS h
+                JOIN photo_clothes AS p
+                ON h.id_clothes = p.id_clothes
+                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NOT NULL
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, file_hash, True)
+            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
+            if not result:
+                result = False
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error in is_photo_catalog_among_deleted {str(e)}")
+            return None
+
+    @staticmethod
+    def is_photo_users_unique(file_hash, id_user):
+        """Проверяет, есть ли уже такое фото у пользователя среди неудалённых"""
+        try:
+            query = """
+                SELECT h.id_photo FROM hash_photos_users AS h
+                JOIN photo_users AS p
+                ON h.id_photo = p.id_photo
+                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NULL
+                LIMIT 1
+            """
+            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
             ret = True
             if result:
                 ret = False
             return ret
         except Error as e:
             logging.error(f"Error in is_photo_users_unique {str(e)}")
+            return None
+
+    @staticmethod
+    def is_photo_user_among_deleted(file_hash, id_user):
+        """Проверяет, есть ли уже такое фото у пользователя среди удалённых"""
+        try:
+            query = """
+                SELECT h.id_photo FROM hash_photos_users AS h
+                JOIN photo_users AS p
+                ON h.id_photo = p.id_photo
+                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NOT NULL
+                LIMIT 1
+            """
+            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
+            if not result:
+                result = False
+            else:
+                result = result[0][0]
+            return result
+        except Error as e:
+            logging.error(f"Error in is_photo_user_among_deleted {str(e)}")
             return None
 
     @staticmethod
@@ -520,7 +590,8 @@ class ManageQuery:
             """
             result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
 
-            if result and ManageQuery.delete_hash_photos_clothes(id_clothes):
+            # if result and ManageQuery.delete_hash_photos_clothes(id_clothes):
+            if result:
                 return {'status': 'success', 'id': result[0]}
             return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
 
@@ -552,7 +623,8 @@ class ManageQuery:
             """
             result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
 
-            if result and ManageQuery.delete_hash_photos_catalog(id_clothes):
+            # if result and ManageQuery.delete_hash_photos_catalog(id_clothes):
+            if result:
                 return {'status': 'success', 'id': result[0]}
             return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
 
@@ -767,7 +839,35 @@ class ManageQuery:
             """
             result = ManageQuery._execute_query(query, (id_clothes, id_user), fetch_insert=True)
             if result:
-                return {'status': 'success', 'id': result[0]}
+                return {
+                    'status': 'success',
+                    'id': result[0]
+                }
             return {'status': 'error', 'message': 'Не удалось выполнить восстановление фото одежды из гардероба'}
         except Error as e:
             logging.error(f"Error recovery_photos_wardrobe_db {str(e)}")
+
+    @staticmethod
+    def recovery_photos_human_db(id_photo, id_user):
+        """
+        Восстанавливает удалённое фото человека
+        :param id_photo:
+        :param id_user:
+        :return:
+        """
+        try:
+            query = """
+                    UPDATE photo_users
+                    SET deleted_at = NULL
+                    WHERE id_photo = %s AND id_user = %s
+                    RETURNING id_photo
+            """
+            result = ManageQuery._execute_query(query, (id_photo, id_user), fetch_insert=True)
+            if result:
+                return {
+                    'status': 'success',
+                    'id': result[0]
+                }
+            return {'status': 'error', 'message': 'Не удалось выполнить восстановление фото человека'}
+        except Error as e:
+            logging.error(f"Error recovery_photos_human_db {str(e)}")

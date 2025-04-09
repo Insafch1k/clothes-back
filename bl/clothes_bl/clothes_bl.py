@@ -215,4 +215,3 @@ def get_clothes_by_type(source, user_name, category, sub_subcategory, page, limi
 
     except Exception as error:
         return jsonify({"error": f"Ошибка получения одежды: {str(error)}"}), 500
-

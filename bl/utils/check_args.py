@@ -82,11 +82,11 @@ class CheckArgs:
         return ret
 
     @staticmethod
-    def check_args_recovery_photos(id_clothes, user_name):
+    def check_args_recovery_photos(id, user_name):
         ret = {
             "status": "success"
         }
-        if not id_clothes:
+        if not id:
             ret = {
                 "status": "error",
                 "error": "Отсутствует параметр id"
@@ -116,6 +116,27 @@ class CheckArgs:
             return {
                 "status": "error",
                 "error": f"Фото одежды с id {id_clothes} не удалено"
+            }
+        return result
+
+    @staticmethod
+    def check_args_recovery_photos_human(id_photo, user_name):
+        # Проверка необходимых данных
+        result = CheckArgs.check_args_recovery_photos(id_photo, user_name)
+        if result["status"] == "error":
+            return result
+
+        id_user = dal.db_query.ManageQuery.get_id_user(user_name)
+        if id_user is None:
+            return {
+                "status": "error",
+                "error": f"user_name '{user_name}' не найден"
+            }
+
+        if not dal.db_query.ManageQuery.is_photo_user_deleted(id_photo):
+            return {
+                "status": "error",
+                "error": f"Фото человека {user_name} с id_фото {id_photo} не удалено"
             }
         return result
 

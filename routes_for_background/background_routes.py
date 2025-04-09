@@ -13,6 +13,10 @@ background_blueprint = Blueprint("background_blueprint", __name__)
 
 create_folders_for_background()
 
+"""
+Этот файл разделяется на более мелкие, поэтому скоро удалится
+"""
+
 
 @background_blueprint.route("/process", methods=["POST"])
 def upload_file():
@@ -29,6 +33,11 @@ def upload_file():
         return jsonify({"error": "Отсутствует параметр user_name"}), 400
     if not photo_base64:
         return jsonify({"error": "Отсутствует параметр photo (base64)"}), 400
+    id_user = ManageQuery.get_id_user(user_name)
+    if not id_user:
+        return jsonify({
+            "error": f"Пользователь с именем {user_name} не найден"
+        }), 400
 
     try:
         # Декодируем base64
@@ -36,8 +45,17 @@ def upload_file():
 
         # Проверяем уникальность по хэшу
         file_hash = calculate_hash(decode_image)
-        if not ManageQuery.is_photo_users_unique(file_hash):
+        if not ManageQuery.is_photo_users_unique(file_hash, id_user):
             return jsonify({"error": "Photo already exists"}), 400
+
+        # Проверяем, есть ли уже такое фото у пользователя среди удалённых, если есть, то восстанавливаем его
+        id_photo = ManageQuery.is_photo_user_among_deleted(file_hash, id_user)
+        if id_photo:
+            result = ManageQuery.recovery_photos_human_db(id_photo, id_user)
+            if result['status'] == 'error':
+                return jsonify(result), 500
+            else:
+                return jsonify(result), 200
 
         # Генерируем уникальное имя файла.
         # Декодируем base64 и сохраняем изображение
@@ -96,7 +114,7 @@ def delete_photo_user(id_photo):
         if result["status"] == "success":
             ret = jsonify({
                 "status": "success",
-                "message": f"Фото одежды с id {id_photo} успешно удалено",
+                "message": f"Фото пользователя с id {id_photo} успешно удалено",
                 "id": result["id"]
             }), 200
 
@@ -116,12 +134,12 @@ def delete_photo_user(id_photo):
         }), 500
 
 
-@background_blueprint.route("/processed/<filename>", methods=["GET"])
-def get_processed_image(filename):
-    """
-    Возвращает обработанное изображение по ссылке.
-    """
-    return send_from_directory(PROCESSED_FOLDER_BACKGROUND, filename)
+# @background_blueprint.route("/processed/<filename>", methods=["GET"])
+# def get_processed_image(filename):
+#     """
+#     Возвращает обработанное изображение по ссылке.
+#     """
+#     return send_from_directory(PROCESSED_FOLDER_BACKGROUND, filename)
 
 
 @background_blueprint.route("/user_photos/<user_name>", methods=["GET"])
