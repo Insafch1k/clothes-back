@@ -132,7 +132,7 @@ def save_photo_to_db(processed_path, file_hash, user_name, category, subcategory
         return None, jsonify({"error": f"Ошибка при работе с БД: {str(e)}"}), 500
 
 
-def validate_and_get_id(source, user_name, category, sub_subcategory):
+def validate_and_get_id(source, user_name, category, subcategory, sub_subcategory):
     id_user = None
     try:
         if source == "wardrobe":
@@ -144,6 +144,10 @@ def validate_and_get_id(source, user_name, category, sub_subcategory):
         if id_category is None:
             return {"error": f"Категория '{category}' не найдена"}, 404
 
+        id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
+        if id_subcategory is None:
+            return {"error": f"Подкатегория '{category}' не найдена"}, 404
+
         id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
         if id_sub_subcategory is None:
             return {"error": f"Подподкатегория '{sub_subcategory}' не найдена"}, 404
@@ -151,6 +155,7 @@ def validate_and_get_id(source, user_name, category, sub_subcategory):
         return {
             "id_user": id_user,
             "id_category": id_category,
+            "id_subcategory": id_subcategory,
             "id_sub_subcategory": id_sub_subcategory
         }, 200
     except Exception as e:
@@ -184,26 +189,27 @@ def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcatego
         raise
 
 
-def get_clothes_by_type(source, user_name, category, sub_subcategory, page, limit):
+def get_clothes_by_type(source, user_name, category, subcategory, sub_subcategory, page, limit):
     try:
         offset = (page - 1) * limit
 
-        id_result, status_code = validate_and_get_id(source, user_name, category, sub_subcategory)
+        id_result, status_code = validate_and_get_id(source, user_name, category, subcategory, sub_subcategory)
 
         if status_code != 200:
             return id_result, status_code
 
         id_user = id_result.get("id_user")
         id_category = id_result.get("id_category")
+        id_subcategory = id_result.get("id_subcategory")
         id_sub_subcategory = id_result.get("id_sub_subcategory")
 
         clothes_list, total_items = fetch_clothes(
-            source, id_user, id_category, id_sub_subcategory, limit, offset
+            source, id_user, id_category, id_subcategory, id_sub_subcategory, limit, offset
         )
 
         if not clothes_list:
             return jsonify(
-                {"error": f"Одежда в категории '{category}' и подподкатегории '{sub_subcategory}' не найдена"}), 404
+                {"error": f"Одежда в категории '{category}', подкатегории '{subcategory}' и подподкатегории '{sub_subcategory}' не найдена"}), 404
 
         clothes_list = [Base64Utils.encode_to_base64(item) for item in clothes_list]
 
