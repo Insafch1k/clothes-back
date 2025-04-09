@@ -7,7 +7,7 @@ get_wardrobe_catalog = Blueprint("get_wardrobe_catalog", __name__)
 @get_wardrobe_catalog.route("/wardrobe/<user_name>/<category>/<subcategory>/<sub_subcategory>", methods=["GET"])
 def get_clothes_from_wardrobe(user_name, category, subcategory, sub_subcategory):
     """
-    Возвращает список одежды из гардероба по категории и подподкатегории.
+    Возвращает список одежды из гардероба по категории, подкатегории и под_подкатегории.
     """
     try:
         page = request.args.get("page", default=1, type=int)
@@ -32,10 +32,11 @@ def get_clothes_from_wardrobe(user_name, category, subcategory, sub_subcategory)
     except Exception as error:
         return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
 
+
 @get_wardrobe_catalog.route("/catalog/<category>/<subcategory>/<sub_subcategory>", methods=["GET"])
 def get_clothes_from_catalog(category, subcategory, sub_subcategory):
     """
-    Возвращает список одежды из каталога по указанной категории и под подкатегории.
+    Возвращает список одежды из каталога по указанной категории, подкатегории и под_подкатегории.
     """
     try:
         page = request.args.get("page", default=1, type=int)
