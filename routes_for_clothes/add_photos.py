@@ -1,5 +1,4 @@
-from flask import Blueprint, request, jsonify, send_from_directory
-import os
+from flask import Blueprint, request, jsonify
 from bl.utils.base64_utils import Base64Utils
 import bl.clothes_bl.clothes_bl as clothes_bl
 from dal.db_query import ManageQuery
@@ -28,17 +27,11 @@ def process_clothes():
     if result["status"] == "error":
         return jsonify(result), 400
 
-    id_user = ManageQuery.get_id_user(user_name)
-    if not id_user:
-        return jsonify({
-            "error": f"Пользователь с именем {user_name} не найден"
-        }), 400
-
     try:
         # Проверка уникальности
         decode_image = Base64Utils.decode_base64_in_image(photo_base64)
         file_hash = calculate_hash(decode_image)
-        if not ManageQuery.is_photo_clothes_unique(file_hash, id_user):
+        if not ManageQuery.is_photo_clothes_unique(file_hash, result):
             return jsonify({"error": "Photo already exists"}), 400
 
         processed_path, file_hash, error_response, status_code = clothes_bl.process_photo_common(
@@ -55,9 +48,10 @@ def process_clothes():
             processed_path,
             file_hash,
             user_name,
-            category,
-            subcategory,
-            sub_subcategory,
+            result["id_category"],
+            result["id_subcategory"],
+            result["id_sub_subcategory"],
+            result["id_user"],
             ManageQuery.add_hash_photos_clothes
         )
         if error_response:
@@ -88,21 +82,15 @@ def add_photos_in_catalog():
     if result["status"] == "error":
         return jsonify(result), 400
 
-    is_admin = CheckArgs.check_is_admin(user_name)
+    is_admin = CheckArgs.check_is_admin(result["id_user"])
     if is_admin["status"] == "error":
         return jsonify(is_admin), 403
-
-    id_user = ManageQuery.get_id_user(user_name)
-    if not id_user:
-        return jsonify({
-            "error": f"Пользователь с именем {user_name} не найден"
-        }), 400
 
     try:
         # Проверка уникальности
         decode_image = Base64Utils.decode_base64_in_image(photo_base64)
         file_hash = calculate_hash(decode_image)
-        if not ManageQuery.is_photo_catalog_unique(file_hash, id_user):
+        if not ManageQuery.is_photo_catalog_unique(file_hash, result):
             return jsonify({"error": "Photo already exists"}), 400
 
         # Обработка фото
@@ -120,9 +108,10 @@ def add_photos_in_catalog():
             processed_path,
             file_hash,
             user_name,
-            category,
-            subcategory,
-            sub_subcategory,
+            result["id_category"],
+            result["id_subcategory"],
+            result["id_sub_subcategory"],
+            result["id_user"],
             ManageQuery.add_hash_photos_clothes_catalog
         )
         if error_response:

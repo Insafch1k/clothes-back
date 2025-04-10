@@ -196,17 +196,20 @@ class ManageQuery:
             logging.error(f"Error exist id photo {str(e)}")
 
     @staticmethod
-    def is_photo_clothes_unique(file_hash, id_user):
+    def is_photo_clothes_unique(file_hash, data):
         """Проверяет, есть ли уже такое фото одежды у пользователя среди неудалённых"""
         try:
             query = """
                 SELECT h.id_clothes FROM hash_photos_clothes AS h
                 JOIN photo_clothes AS p
                 ON h.id_clothes = p.id_clothes
-                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NULL
+                WHERE hash = %s AND p.id_user = %s AND p.id_category = %s
+                AND p.id_subcategory = %s AND p.id_sub_subcategory = %s AND deleted_at IS NULL
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
+            result = ManageQuery._execute_query(query, (
+                file_hash, data["id_user"], data["id_category"], data["id_subcategory"], data["id_sub_subcategory"]),
+                                                True)
             ret = True
             if result:
                 ret = False
@@ -237,17 +240,20 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def is_photo_catalog_unique(file_hash, id_user):
+    def is_photo_catalog_unique(file_hash, data):
         """Проверяет, есть ли уже такое фото одежды в каталоге среди неудалённых"""
         try:
             query = """
                 SELECT h.id_clothes FROM hash_photos_catalog AS h
                 JOIN photo_clothes AS p
                 ON h.id_clothes = p.id_clothes
-                WHERE hash = %s AND p.id_user = %s AND deleted_at IS NULL
+                WHERE hash = %s AND p.id_user = %s AND p.id_category = %s
+                AND p.id_subcategory = %s AND p.id_sub_subcategory = %s AND deleted_at IS NULL
                 LIMIT 1
             """
-            result = ManageQuery._execute_query(query, (file_hash, id_user), True)
+            result = ManageQuery._execute_query(query, (
+                file_hash, data["id_user"], data["id_category"], data["id_subcategory"], data["id_sub_subcategory"]),
+                                                True)
             ret = True
             if result:
                 ret = False
@@ -506,30 +512,19 @@ class ManageQuery:
         return ret
 
     @staticmethod
-    def add_photo_clothes(user_name, photo_path, category, subcategory, sub_subcategory,
+    def add_photo_clothes(user_name, photo_path, id_category, id_subcategory, id_sub_subcategory, id_user,
                           is_cut=True):  # Добавляет фото одежды в базу данных
         ret = False
 
         try:
-            id_user = ManageQuery.get_id_user(user_name)
-            id_category = ManageQuery.get_id_category_clothes(category)
-            id_subcategory = ManageQuery.get_id_subcategory_clothes(subcategory)
-            id_sub_subcategory = ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
-
-            if CheckArgs.check_args_add_photo_clothes_db(id_user, id_category, id_subcategory, id_sub_subcategory,
-                                                         user_name,
-                                                         category, subcategory,
-                                                         sub_subcategory, photo_path):
-                query = """
-                        INSERT INTO photo_clothes (id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut)
-                        VALUES (%s, %s, %s, %s, %s, %s) returning id_clothes
-                """
-                id_clothes = ManageQuery._execute_query(query, (
-                    id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut), fetch_insert=True)
-                logging.info(f"Photo clothes added successfully for user {user_name}")
-                ret = id_clothes
-            else:
-                logging.error("Invalid user id, subcategory id, or photo_path is empty")
+            query = """
+                    INSERT INTO photo_clothes (id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut)
+                    VALUES (%s, %s, %s, %s, %s, %s) returning id_clothes
+            """
+            id_clothes = ManageQuery._execute_query(query, (
+                id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut), fetch_insert=True)
+            logging.info(f"Photo clothes added successfully for user {user_name}")
+            ret = id_clothes
         except Error as e:
             logging.error(f"Error add photo clothes {str(e)}")
         return ret

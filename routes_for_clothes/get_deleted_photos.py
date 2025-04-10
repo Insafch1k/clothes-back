@@ -4,6 +4,7 @@ from dal.db_query import ManageQuery
 
 get_deleted_photos = Blueprint("get_deleted_photos", __name__)
 
+
 @get_deleted_photos.route("/deleted/photos/<photo_type>/<user_name>", methods=["GET"])
 def get_back_deleted_photo(photo_type, user_name):
     logging.debug(f"Запрос: photo_type={photo_type}, user_name={user_name}")
