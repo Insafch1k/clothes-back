@@ -106,7 +106,7 @@ def process_photo_common(photo_base64, writing_func, remove_bg_func, processed_f
         return None, None, jsonify({"error": f"Ошибка обработки: {str(e)}"}), 500
 
 
-def save_photo_to_db(processed_path, file_hash, user_name, category, subcategory, sub_subcategory, add_hash_func):
+def save_photo_to_db(processed_path, file_hash, user_name, id_category, id_subcategory, id_sub_subcategory, id_user, add_hash_func):
     """
     Сохранение информации о фото в БД
     """
@@ -114,9 +114,10 @@ def save_photo_to_db(processed_path, file_hash, user_name, category, subcategory
         id_clothes = ManageQuery.add_photo_clothes(
             user_name=user_name,
             photo_path=processed_path,
-            category=category,
-            subcategory=subcategory,
-            sub_subcategory=sub_subcategory,
+            id_category=id_category,
+            id_subcategory=id_subcategory,
+            id_sub_subcategory=id_sub_subcategory,
+            id_user=id_user,
             is_cut=True
         )
 
@@ -185,7 +186,7 @@ def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcatego
 
         return clothes, total
     except Exception as e:
-        logging.exception("Ошибка в fetch_clothes")
+        logging.exception(f"Ошибка в fetch_clothes {str(e)}")
         raise
 
 
