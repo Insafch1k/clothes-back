@@ -377,18 +377,17 @@ class ManageQuery:
                                             offset=0):  # Получает id_subcategory, id_category, id_sub_subcategory фото одежды по названию подкатегории
         try:
             query = """
-                     SELECT photo_path FROM photo_clothes
-                     WHERE id_user = %s AND id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s
+                     SELECT id_clothes, photo_path FROM photo_clothes
+                     WHERE id_user = %s AND id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
                      LIMIT %s OFFSET %s
              """
             result = ManageQuery._execute_query(query, (
                 id_user, id_category, id_subcategory, id_sub_subcategory, limit, offset), True)
             if not result:
                 result = None
-            else:
-                for i in range(len(result)):
-                    result[i] = result[i][0]
-            return result
+
+            clothes_list = [{"id_clothes": row[0], "photo_path": row[1]} for row in result]
+            return clothes_list
         except Error as e:
             logging.error(f"Error get_clothes_from_wardrobe_paginated {str(e)}")
             return None
@@ -400,35 +399,33 @@ class ManageQuery:
         """
         try:
             query = """
-                SELECT photo_path
+                SELECT id_clothes, photo_path
                 FROM photo_clothes
                 WHERE id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
-                WHERE id_category = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
                 LIMIT %s OFFSET %s
             """
             result = ManageQuery._execute_query(query, (id_category, id_subcategory, id_sub_subcategory, limit, offset),
                                                 fetch=True)
             if not result:
                 result = None
-            else:
-                for i in range(len(result)):
-                    result[i] = result[i][0]
-            return result
+
+            clothes = [{"id_clothes": row[0], "photo_path": row[1]} for row in result]
+            return clothes
         except Error as e:
             logging.error(f"Error get_clothes_from_catalog_paginated {str(e)}")
             return None
 
     @staticmethod
-    def count_clothes_in_wardrobe(id_user, id_category, id_sub_subcategory):
+    def count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory):
         """
         Возвращает общее количество элементов одежды в гардеробе.
         """
         try:
             query = """
             SELECT COUNT(*) FROM photo_clothes
-            WHERE id_user = %s AND id_category = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
+            WHERE id_user = %s AND id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
             """
-            result = ManageQuery._execute_query(query, (id_user, id_category, id_sub_subcategory), fetch=True)
+            result = ManageQuery._execute_query(query, (id_user, id_category, id_subcategory, id_sub_subcategory), fetch=True)
             if not result:
                 result = None
             else:
@@ -440,16 +437,16 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def count_clothes_in_catalog(id_category, id_sub_subcategory):
+    def count_clothes_in_catalog(id_category, id_subcategory, id_sub_subcategory):
         """
         Возвращает общее количество элементов одежды в каталоге.
         """
         try:
             query = """
                  SELECT COUNT(*) FROM photo_clothes
-                 WHERE id_category = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
+                 WHERE id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
              """
-            result = ManageQuery._execute_query(query, (id_category, id_sub_subcategory), fetch=True)
+            result = ManageQuery._execute_query(query, (id_category, id_subcategory, id_sub_subcategory), fetch=True)
             if not result:
                 result = None
             else:
@@ -875,7 +872,7 @@ class ManageQuery:
     @staticmethod
     def get_deleted_photos_by_type(id_user, photo_type):
         """
-        Возвращает список удалённых фото по типу: 'users' или 'clothes'
+        Возвращает список удалённых фото по типу: 'my_look' или 'my_clothing'
         """
         try:
             if photo_type == "users":
