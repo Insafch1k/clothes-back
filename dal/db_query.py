@@ -512,7 +512,7 @@ class ManageQuery:
         return ret
 
     @staticmethod
-    def add_photo_clothes(user_name, photo_path, id_category, id_subcategory, id_sub_subcategory, id_user,
+    def add_photo_clothes(photo_path, id_category, id_subcategory, id_sub_subcategory, id_user,
                           is_cut=True):  # Добавляет фото одежды в базу данных
         ret = False
 
@@ -523,7 +523,7 @@ class ManageQuery:
             """
             id_clothes = ManageQuery._execute_query(query, (
                 id_user, photo_path, id_category, id_subcategory, id_sub_subcategory, is_cut), fetch_insert=True)
-            logging.info(f"Photo clothes added successfully for user {user_name}")
+            logging.info(f"Photo clothes added successfully")
             ret = id_clothes
         except Error as e:
             logging.error(f"Error add photo clothes {str(e)}")

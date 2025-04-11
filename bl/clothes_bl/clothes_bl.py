@@ -58,12 +58,12 @@ def remove_background_clothes_catalog(input_path):
 
 def get_data_from_json_add_photos(data):
     photo_base64 = data.get("image")
-    user_name = data.get("user_name")
+    # user_name = data.get("user_name")
     category = data.get("category")
     subcategory = data.get("subcategory")
     sub_subcategory = data.get("sub_subcategory")
 
-    return photo_base64, user_name, category, subcategory, sub_subcategory
+    return photo_base64, category, subcategory, sub_subcategory
 
 
 def get_data_from_json_recovery_photos(data):
@@ -106,13 +106,13 @@ def process_photo_common(photo_base64, writing_func, remove_bg_func, processed_f
         return None, None, jsonify({"error": f"Ошибка обработки: {str(e)}"}), 500
 
 
-def save_photo_to_db(processed_path, file_hash, user_name, id_category, id_subcategory, id_sub_subcategory, id_user, add_hash_func):
+def save_photo_to_db(processed_path, file_hash, id_category, id_subcategory, id_sub_subcategory, id_user,
+                     add_hash_func):
     """
     Сохранение информации о фото в БД
     """
     try:
         id_clothes = ManageQuery.add_photo_clothes(
-            user_name=user_name,
             photo_path=processed_path,
             id_category=id_category,
             id_subcategory=id_subcategory,
@@ -171,15 +171,15 @@ def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcatego
                 id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
-            total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory)
-
+            # total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory)
+            total = 1
         elif source == "catalog":
             clothes = ManageQuery.get_clothes_from_catalog_paginated(
                 id_category=id_category, id_subcategory=id_subcategory, id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
-            total = ManageQuery.count_clothes_in_catalog(id_category, id_subcategory, id_sub_subcategory)
-
+            # total = ManageQuery.count_clothes_in_catalog(id_category, id_subcategory, id_sub_subcategory)
+            total = 1
         else:
             logging.error(f"Invalid source: {source}")
             raise ValueError("Invalid source")
@@ -210,7 +210,8 @@ def get_clothes_by_type(source, user_name, category, subcategory, sub_subcategor
 
         if not clothes_list:
             return jsonify(
-                {"error": f"Одежда в категории '{category}', подкатегории '{subcategory}' и подподкатегории '{sub_subcategory}' не найдена"}), 404
+                {
+                    "error": f"Одежда в категории '{category}', подкатегории '{subcategory}' и подподкатегории '{sub_subcategory}' не найдена"}), 404
 
         clothes_list = [Base64Utils.encode_to_base64(item) for item in clothes_list]
 

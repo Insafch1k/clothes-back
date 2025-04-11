@@ -47,19 +47,19 @@ class CheckArgs:
     # def check_args_add_photo_clothes():
 
     @staticmethod
-    def check_args_add_photo_clothes(photo_base64, user_name, category, subcategory, sub_subcategory):
+    def check_args_add_photo_clothes(photo_base64, category, subcategory, sub_subcategory):
         ret = {
             "status": "success"
         }
-        id_user = dal.db_query.ManageQuery.get_id_user(user_name)
+        # id_user = dal.db_query.ManageQuery.get_id_user(user_name)
         id_category = dal.db_query.ManageQuery.get_id_category_clothes(category)
         id_subcategory = dal.db_query.ManageQuery.get_id_subcategory_clothes(subcategory)
         id_sub_subcategory = dal.db_query.ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
-        if id_user is None:
-            ret = {
-                "status": "error",
-                "error": f"User '{user_name}' not found"
-            }
+        # if id_user is None:
+        #     ret = {
+        #         "status": "error",
+        #         "error": f"User '{user_name}' not found"
+        #     }
         if id_category is None:
             ret = {
                 "status": "error",
@@ -77,11 +77,11 @@ class CheckArgs:
                 "error": f"Sub_subcategory '{sub_subcategory}' not found"
             }
 
-        if not user_name:
-            ret = {
-                "status": "error",
-                "error": "Отсутствует параметр user_name"
-            }
+        # if not user_name:
+        #     ret = {
+        #         "status": "error",
+        #         "error": "Отсутствует параметр user_name"
+        #     }
         if not photo_base64:
             ret = {
                 "status": "error",
@@ -104,7 +104,7 @@ class CheckArgs:
             }
 
         if ret["status"] == "success":
-            ret["id_user"] = id_user
+            # ret["id_user"] = id_user
             ret["id_category"] = id_category
             ret["id_subcategory"] = id_subcategory
             ret["id_sub_subcategory"] = id_sub_subcategory

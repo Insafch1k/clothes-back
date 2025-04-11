@@ -1,8 +1,9 @@
 -- Создание таблицы Users
 CREATE TABLE Users (
     id_user SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    password TEXT NOT NULL
+    tg_id TEXT,
+    name TEXT,
+    password TEXT
 );
 
 -- Создание таблицы Category_photos
