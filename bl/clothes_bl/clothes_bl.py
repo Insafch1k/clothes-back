@@ -213,7 +213,13 @@ def get_clothes_by_type(source, user_name, category, subcategory, sub_subcategor
                 {
                     "error": f"Одежда в категории '{category}', подкатегории '{subcategory}' и подподкатегории '{sub_subcategory}' не найдена"}), 404
 
-        clothes_list = [Base64Utils.encode_to_base64(item) for item in clothes_list]
+        clothes_list = [
+            {
+                "id_clothes": item["id_clothes"],
+                "photo": Base64Utils.encode_to_base64(item["photo_path"])
+            }
+            for item in clothes_list
+        ]
 
         return jsonify({
             "page": page,
