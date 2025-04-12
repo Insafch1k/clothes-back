@@ -16,7 +16,7 @@ def standard_login():
         return jsonify({'status': 'error', 'message': 'Name and password required'}), 400
 
     result = Authenticate.authenticate_user_by_name_password(username, password)
-    if result["status"] == "error":
+    if result is None or result["status"] == "error":
         return jsonify(result), 401
 
     # Создаём токены

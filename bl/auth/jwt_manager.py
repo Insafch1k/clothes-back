@@ -10,7 +10,7 @@ jwt = JWTManager()
 
 
 def setup_jwt(app):
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')  # Измените в production
+    app.config['JWT_SECRET_KEY'] = os.getenv('SECRET_KEY')  # Измените в production
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 

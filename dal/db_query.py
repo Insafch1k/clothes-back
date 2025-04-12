@@ -390,7 +390,7 @@ class ManageQuery:
             result = ManageQuery._execute_query(query, (
                 id_user, id_category, id_subcategory, id_sub_subcategory, limit, offset), True)
             if not result:
-                result = None
+                return None
 
             clothes_list = [{"id_clothes": row[0], "photo_path": row[1]} for row in result]
             return clothes_list
@@ -431,12 +431,12 @@ class ManageQuery:
             SELECT COUNT(*) FROM photo_clothes
             WHERE id_user = %s AND id_category = %s AND id_subcategory = %s AND id_sub_subcategory = %s AND deleted_at IS NULL
             """
-            result = ManageQuery._execute_query(query, (id_user, id_category, id_subcategory, id_sub_subcategory), fetch=True)
+            result = ManageQuery._execute_query(query, (id_user, id_category, id_subcategory, id_sub_subcategory),
+                                                fetch=True)
             if not result:
                 result = None
             else:
-                for i in range(len(result)):
-                    result[i] = result[i][0]
+                result = result[0][0]
             return result
         except Error as e:
             logging.error(f"Error count_clothes_in_wardrobe {str(e)}")
@@ -456,8 +456,7 @@ class ManageQuery:
             if not result:
                 result = None
             else:
-                for i in range(len(result)):
-                    result[i] = result[i][0]
+                result = result[0][0]
             return result
         except Error as e:
             logging.error(f"Error count_clothes_in_catalog {str(e)}")
