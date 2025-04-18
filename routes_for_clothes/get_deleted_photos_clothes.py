@@ -1,6 +1,7 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import logging
 from dal.db_query import ManageQuery
+import base64
 
 get_deleted_clothes_photos = Blueprint("get_deleted_clothes_photos", __name__)
 
@@ -8,20 +9,43 @@ get_deleted_clothes_photos = Blueprint("get_deleted_clothes_photos", __name__)
 @get_deleted_clothes_photos.route("/deleted/photos/<user_name>", methods=["GET"])
 def get_back_deleted_clothes_photo(user_name):
     try:
+        limit = request.args.get('limit', default=20, type=int)
+        offset = request.args.get('offset', default=0, type=int)
+
         id_user = ManageQuery.get_id_user(user_name)
         if id_user is None:
-            return jsonify({"error": f"user_name '{user_name}' не найден"}), 404
+            return jsonify({"error": f"user_name '{user_name}' not found"}), 404
 
-        photos = ManageQuery.get_deleted_photos_by_type(id_user, "clothes")
+        photos = ManageQuery.get_deleted_photos_by_type(id_user, "clothes", limit, offset)
         if not photos:
             return jsonify({
-                "error": f"Удаленные фото одежды для пользователя '{user_name}' не найдены"
+                "error": f"Deleted photos of clothes '{user_name}' not found"
             }), 404
+
+        encoded_photos = []
+        for photo in photos:
+            try:
+                with open(photo["photo_path"], "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                    encoded_photos.append({
+                        "id_photo": photo["id_photo"],
+                        "photo_base64": encoded_string
+                    })
+            except Exception as e:
+                logging.error(f"Error encoding photo {photo['photo_path']}: {str(e)}")
+                continue
+
+        if not encoded_photos:
+            return jsonify({
+                "error": f"Failed to encode deleted photos for user '{user_name}'"
+            }), 500
 
         return jsonify({
             "photo_type": "clothes",
             "user_name": user_name,
-            "deleted_photos": photos
+            "limit": limit,
+            "offset": offset,
+            "deleted_photos": encoded_photos
         }), 200
 
     except Exception as error:

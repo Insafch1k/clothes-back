@@ -864,9 +864,9 @@ class ManageQuery:
             logging.error(f"Error recovery_photos_human_db {str(e)}")
 
     @staticmethod
-    def get_deleted_photos_by_type(id_user, photo_type):
+    def get_deleted_photos_by_type(id_user, photo_type, limit=20, offset=0):
         """
-        Возвращает список удалённых фото по типу: 'my_look' или 'my_clothing'
+        Returns a list of deleted photos by type: 'users' or 'clothes'
         """
         try:
             if photo_type == "users":
@@ -874,21 +874,23 @@ class ManageQuery:
             elif photo_type == "clothes":
                 table_name = "photo_clothes"
             else:
-                raise ValueError("Неподдерживаемый тип фото")
+                raise ValueError("Unsupported photo type")
 
             query = f"""
-                SELECT photo_path
+                SELECT id_photo, photo_path
                 FROM {table_name}
-                WHERE id_user = %s AND deleted_at IS NOT NULL
+                WHERE id_user = %s AND deleted_at IS NOT NULL   
+                ORDER BY id_photo DESC
+                LIMIT %s OFFSET %s
             """
-            result = ManageQuery._execute_query(query, (id_user,), fetch=True)
+            result = ManageQuery._execute_query(query, (id_user, limit, offset), fetch=True)
             if not result:
                 result = None
             else:
-                result = result[0][0]
+                result = [{"id_photo": row[0], "photo_path": row[1]} for row in result]
             return result
         except Error as e:
-            logging.error(f"Error get_deleted_photos_by_type {str(e)}")
+            logging.error(f"Error getting deleted photos: {str(e)}")
             return None
 
     @staticmethod
