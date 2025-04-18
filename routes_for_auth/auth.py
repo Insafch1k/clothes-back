@@ -49,13 +49,13 @@ def telegram_login():
         return jsonify(result), 500
 
     # Создаём токены
-    access_token = create_access_token(identity=result["id_user"])
-    refresh_token = create_refresh_token(identity=result["id_user"])
+    access_token = create_access_token(identity=str(result["id_user"]))
+    # refresh_token = create_refresh_token(identity=result["id_user"])
 
     return jsonify({
         'status': 'success',
         'access_token': access_token,
-        'refresh_token': refresh_token,
+        # 'refresh_token': refresh_token,
         'id_user': result["id_user"]
     })
 

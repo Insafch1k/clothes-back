@@ -47,19 +47,20 @@ class CheckArgs:
     # def check_args_add_photo_clothes():
 
     @staticmethod
-    def check_args_add_photo_clothes(photo_base64, category, subcategory, sub_subcategory):
+    def check_args_add_photo_clothes(id_user, photo_base64, category, subcategory, sub_subcategory):
         ret = {
             "status": "success"
         }
-        # id_user = dal.db_query.ManageQuery.get_id_user(user_name)
+        user = dal.db_query.ManageQuery.get_id_user(id_user)
         id_category = dal.db_query.ManageQuery.get_id_category_clothes(category)
         id_subcategory = dal.db_query.ManageQuery.get_id_subcategory_clothes(subcategory)
         id_sub_subcategory = dal.db_query.ManageQuery.get_id_sub_subcategory_clothes(sub_subcategory)
-        # if id_user is None:
-        #     ret = {
-        #         "status": "error",
-        #         "error": f"User '{user_name}' not found"
-        #     }
+
+        if id_user is None:
+            ret = {
+                "status": "error",
+                "error": f"User with id {user} not found"
+            }
         if id_category is None:
             ret = {
                 "status": "error",
@@ -104,7 +105,7 @@ class CheckArgs:
             }
 
         if ret["status"] == "success":
-            # ret["id_user"] = id_user
+            ret["id_user"] = id_user
             ret["id_category"] = id_category
             ret["id_subcategory"] = id_subcategory
             ret["id_sub_subcategory"] = id_sub_subcategory

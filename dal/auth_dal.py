@@ -82,7 +82,7 @@ class Authenticate:
             else:
                 result = {
                     "status": "success",
-                    "id_user": id_user
+                    "id_user": id_user[0]
                 }
             return result
         except Error:
