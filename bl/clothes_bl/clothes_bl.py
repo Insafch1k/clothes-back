@@ -171,15 +171,15 @@ def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcatego
                 id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
-            # total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory)
-            total = 1
+            total = ManageQuery.count_clothes_in_wardrobe(id_user, id_category, id_subcategory, id_sub_subcategory)
+            # total = 1
         elif source == "catalog":
             clothes = ManageQuery.get_clothes_from_catalog_paginated(
                 id_category=id_category, id_subcategory=id_subcategory, id_sub_subcategory=id_sub_subcategory,
                 limit=limit, offset=offset
             )
-            # total = ManageQuery.count_clothes_in_catalog(id_category, id_subcategory, id_sub_subcategory)
-            total = 1
+            total = ManageQuery.count_clothes_in_catalog(id_category, id_subcategory, id_sub_subcategory)
+            # total = 1
         else:
             logging.error(f"Invalid source: {source}")
             raise ValueError("Invalid source")

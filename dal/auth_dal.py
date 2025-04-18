@@ -56,7 +56,10 @@ class Authenticate:
             return result
         except Error as e:
             logging.error(f"Error authenticating user: {str(e)}")
-            return None
+            return {
+                "status": "error",
+                "message": "Database error"
+            }
 
     @staticmethod
     def register_user_by_tg_id_if_not_exists(tg_id):
