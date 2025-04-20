@@ -14,6 +14,7 @@ add_photos = Blueprint("add_photos", __name__)
 
 
 @add_photos.route("/process", methods=["POST"])
+@jwt_required()
 def process_clothes():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
@@ -27,12 +28,12 @@ def process_clothes():
             request.json)
 
         # Проверка необходимых данных
-        result = CheckArgs.check_args_add_photo_clothes(photo_base64, category, subcategory,
+        result = CheckArgs.check_args_add_photo_clothes(id_user, photo_base64, category, subcategory,
                                                         sub_subcategory)
         if result["status"] == "error":
             return jsonify(result), 400
 
-        result["id_user"] = id_user
+        # result["id_user"] = id_user
 
         # Проверка уникальности
         decode_image = Base64Utils.decode_base64_in_image(photo_base64)
@@ -94,7 +95,6 @@ def add_photos_in_catalog():
         is_admin = CheckArgs.check_is_admin(result["id_user"])
         if is_admin["status"] == "error":
             return jsonify(is_admin), 403
-
 
         # Проверка уникальности
         decode_image = Base64Utils.decode_base64_in_image(photo_base64)

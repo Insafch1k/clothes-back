@@ -892,3 +892,25 @@ class ManageQuery:
         except Error as e:
             logging.error(f"Error getting deleted photos: {str(e)}")
             return None
+
+    @staticmethod
+    def exist_id_user(id_user):
+        """
+        Проверяет существование пользователя по его id в бд
+        :param id_user:
+        :return:
+        """
+        try:
+            query = """
+                    SELECT id_user FROM users
+                    WHERE id_user = %s
+            """
+            result = ManageQuery._execute_query(query, id_user, fetch=True)
+            if not result:
+                result = None
+            else:
+                result = [0][0]
+
+        except Error as e:
+            raise
+        return None
