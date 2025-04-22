@@ -8,6 +8,7 @@ from .clothes_fetch_routes import get_wardrobe_catalog
 from .get_deleted_photos_clothes import get_deleted_clothes_photos
 from .delete_photos import delete_photos
 from .putting_on_clothes import putting_on_clothes
+from .get_admin_clothes import get_admin_clothes
 
 clothes_blueprint = Blueprint("clothes_main", __name__, url_prefix='/clothes')
 clothes_blueprint.register_blueprint(get_wardrobe_catalog)
