@@ -30,10 +30,10 @@ class CheckArgs:
     #     return ret
 
     @staticmethod
-    def check_args_add_photo_person(id_user, id_category, user_name, category, photo_path):
+    def check_args_add_photo_person(id_user, id_category, category, photo_path):
         ret = True
         if id_user is None:
-            logging.error(f"User '{user_name}' not found")
+            logging.error(f"User ID is empty")
             ret = False
         if id_category is None:
             logging.error(f"Category '{category}' not found")
