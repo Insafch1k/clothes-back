@@ -2,27 +2,37 @@ from flask import Blueprint, jsonify, request
 import logging
 from dal.db_query import ManageQuery
 from bl.utils.base64_utils import Base64Utils
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 get_deleted_clothes_photos = Blueprint("get_deleted_clothes_photos", __name__)
 
 
-@get_deleted_clothes_photos.route("/deleted/photos/<user_name>", methods=["GET"])
-def get_back_deleted_clothes_photo(user_name):
-    page = request.args.get('page', default=1, type=int)
-    limit = request.args.get('limit', default=20, type=int)
-
-    if page < 1 or limit < 1:
-        return jsonify({"error": "page and limit must be >= 1"}), 400
-
+@get_deleted_clothes_photos.route("/deleted/photos", methods=["GET"])
+@jwt_required()
+def get_back_deleted_clothes_photo():
+    """
+    Возвращает список удаленных фото одежды текущего пользователя
+    """
     try:
-        id_user = ManageQuery.get_id_user(user_name)
-        if id_user is None:
-            return jsonify({"error": f"user_name '{user_name}' not found"}), 404
+        current_id_user = get_jwt_identity()
 
-        photos = ManageQuery.get_deleted_photos_by_type(id_user, "clothes", page, limit)
-        if not photos:
+        page = request.args.get('page', default=1, type=int)
+        limit = request.args.get('limit', default=20, type=int)
+
+        if page < 1 or limit < 1:
+            return jsonify({"error": "page and limit must be >= 1"}), 400
+
+        offset = (page - 1) * limit  # Вычисляем правильный offset
+        photos = ManageQuery.get_deleted_photos_by_type(current_id_user, "clothes", limit, offset)
+
+        if photos is None:  # Изменим проверку на None
             return jsonify({
-                "error": f"Deleted photos of clothes '{user_name}' not found"
+                "error": "Error while retrieving deleted photos"
+            }), 500
+
+        if not photos:  # Пустой список
+            return jsonify({
+                "error": "No deleted photos found"
             }), 404
 
         photo_list = [
@@ -33,19 +43,13 @@ def get_back_deleted_clothes_photo(user_name):
             for photo in photos
         ]
 
-        if not photo_list:
-            return jsonify({
-                "error": f"Failed to encode deleted photos for user '{user_name}'"
-            }), 500
-
         return jsonify({
             "photo_type": "clothes",
-            "user_name": user_name,
-            "limit": page,
-            "offset": limit,
+            "page": page,
+            "limit": limit,
             "deleted_photos": photo_list
         }), 200
 
     except Exception as error:
-        logging.exception("Ошибка при получении удалённых фото одежды")
-        return jsonify({"error": f"Ошибка сервера: {str(error)}"}), 500
+        logging.exception("Error retrieving deleted clothing photos")
+        return jsonify({"error": f"Server error: {str(error)}"}), 500
