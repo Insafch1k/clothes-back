@@ -1,27 +1,46 @@
 from flask import Blueprint, request, jsonify
-import bl.clothes_bl.clothes_bl as clothes_bl
 from dal.db_query import ManageQuery
-from bl.utils.check_args import CheckArgs
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 recovery_photos = Blueprint("recovery_photos", __name__)
 
 
 @recovery_photos.route("/wardrobe/recovery_photos", methods=["POST"])
+@jwt_required()
 def recovery_photos_wardrobe():
     """
     Восстановление фото в гардеробе
     :return: JSON с результатом операции
     """
     try:
+        # Получаем ID текущего пользователя из JWT токена
+        current_id_user = get_jwt_identity()
+
         # Получаем данные из JSON
-        id_clothes, user_name = clothes_bl.get_data_from_json_recovery_photos(request.json)
+        id_clothes = request.json.get('id_clothes')
 
-        ret = CheckArgs.check_args_recovery_photos_wardrobe(id_clothes, user_name)
-        if ret["status"] == "error":
-            return jsonify(ret), 400
+        if not id_clothes:
+            return jsonify({
+                "status": "error",
+                "message": "Clothes ID is required"
+            }), 400
 
-        id_user = ManageQuery.get_id_user(user_name)
-        result = ManageQuery.recovery_photos_wardrobe_db(id_clothes, id_user)
+        # Проверяем существование фото у текущего пользователя
+        if not ManageQuery.exist_id_clothes(id_clothes, current_id_user):
+            return jsonify({
+                "status": "error",
+                "message": f"Clothes with ID {id_clothes} not found"
+            }), 404
+
+        # Проверяем, что фото действительно удалено
+        if not ManageQuery.is_clothes_deleted(id_clothes, current_id_user):
+            return jsonify({
+                "status": "error",
+                "message": f"Clothes with ID {id_clothes} is not deleted"
+            }), 400
+
+        # Восстанавливаем фото
+        result = ManageQuery.recovery_photos_wardrobe_db(id_clothes, current_id_user)
         if result['status'] == 'error':
             ret = jsonify(result), 500
         else:
@@ -29,4 +48,4 @@ def recovery_photos_wardrobe():
 
         return ret
     except Exception as e:
-        return jsonify({"error": f"Ошибка обработки запроса: {str(e)}"}), 500
+        return jsonify({"error": f"Error processing request: {str(e)}"}), 500
