@@ -59,6 +59,24 @@ class ManageQuery:
             return None
 
     @staticmethod
+    def get_id_user_by_id(id_user):
+        """"
+        Проверяет существование пользователя по его ID
+        """
+        try:
+            query = """
+                SELECT id_user FROM users
+                WHERE id_user = %s
+            """
+            result = ManageQuery._execute_query(query, id_user, fetch=True)
+            if result:
+                return result[0][0]
+            return None
+        except Error as e:
+            logging.error(f"Error get_id_user_by_id: {str(e)}")
+            return None
+
+    @staticmethod
     def get_id_category_photos(category):  # Получает id_category фото человека по названию категории
         try:
             query = """
@@ -76,21 +94,20 @@ class ManageQuery:
             return None
 
     @staticmethod
-    def add_photo_user(user_name, photo_path, category="full",
+    def add_photo_user(id_user, photo_path, category="full",
                        is_cut=True):  # Добавляет путь к фото человека в базу данных
         ret = False
 
         try:
-            id_user = ManageQuery.get_id_user(user_name)
             id_category = ManageQuery.get_id_category_photos(category)
-            if CheckArgs.check_args_add_photo_person(id_user, id_category, user_name, category, photo_path):
+            if CheckArgs.check_args_add_photo_person(id_user, id_category, category, photo_path):
                 query = """
                         INSERT INTO photo_users (id_user, photo_path, id_category, is_cut)
                         VALUES (%s, %s, %s, %s) returning id_photo
                 """
                 id_clothes = ManageQuery._execute_query(query, (id_user, photo_path, id_category, is_cut),
                                                         fetch_insert=True)
-                logging.info(f"Photo users added successfully for user {user_name}")
+                logging.info(f"Photo users added successfully for user with id {id_user}")
                 ret = id_clothes
             else:
                 logging.error("Invalid user id, category id or photo path is empty")
@@ -115,37 +132,41 @@ class ManageQuery:
             return False
 
     @staticmethod
-    def delete_photo_user(id_photo):  # Мягкое удаление фото пользователя из базы данных
+    def delete_photo_user(id_photo, id_user):  # Мягкое удаление фото пользователя из базы данных
         if not id_photo:
             logging.error("id photo is empty")
-            return {'status': 'error', 'message': 'ID фото пользователя не указан'}
+            return {'status': 'error', 'message': 'User photo ID not specified'}
 
         try:
             # Проверяем существование записи
             if not ManageQuery.exist_id_photo_user(id_photo):
-                return {'status': 'error', 'message': f'Фото с ID {id_photo} не найдено'}
+                return {'status': 'error', 'message': f'Photos with ID {id_photo} not found'}
 
             # Проверяем, не удалена ли уже запись
             if ManageQuery.is_photo_user_deleted(id_photo):
-                return {'status': 'error', 'message': f'Фото с ID {id_photo} уже удалено'}
+                return {'status': 'error', 'message': f'Photo with ID {id_photo} has already been removed'}
+
+            # Проверяем принадлежность фото пользователю
+            if not ManageQuery.is_photo_belongs_to_user(id_photo, id_user):
+                return {'status': 'error', 'message': f'Photo with ID {id_photo} does not belong to the user'}
 
             # Выполняем мягкое удаление
             query = """
                     UPDATE photo_users
                     SET deleted_at = CURRENT_TIMESTAMP
-                    WHERE id_photo = %s
+                    WHERE id_photo = %s AND id_user = %s
                     RETURNING id_photo
             """
-            result = ManageQuery._execute_query(query, id_photo, fetch_insert=True)
+            result = ManageQuery._execute_query(query, (id_photo, id_user), fetch_insert=True)
 
             # if result and ManageQuery.delete_hash_photos_users(id_photo):
             if result:
                 return {'status': 'success', 'id': result[0]}
-            return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
+            return {'status': 'error', 'message': 'Unable to perform deletion'}
 
         except Error as e:
             logging.error(f"Error delete photo user: {str(e)}")
-            return {'status': 'error', 'message': f'Ошибка базы данных: {str(e)}'}
+            return {'status': 'error', 'message': f'Database error: {str(e)}'}
 
     @staticmethod
     def is_photo_user_deleted(id_photo) -> bool:
@@ -558,37 +579,40 @@ class ManageQuery:
             return False
 
     @staticmethod
-    def delete_photo_clothes(id_clothes):  # Мягкое удаление фото одежды из базы данных
+    def delete_photo_clothes(id_clothes, id_user):  # Мягкое удаление фото одежды из базы данных
         if not id_clothes:
             logging.error("id clothes is empty")
-            return {'status': 'error', 'message': 'ID одежды не указан'}
+            return {'status': 'error', 'message': 'Clothing ID not specified'}
 
         try:
             # Проверяем существование записи
-            if not ManageQuery.exist_id_clothes(id_clothes):
-                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} не найдена'}
+            if not ManageQuery.exist_id_clothes(id_clothes, id_user):
+                return {'status': 'error', 'message': f'Clothes with ID {id_clothes} not found'}
 
             # Проверяем, не удалена ли уже запись
-            if ManageQuery.is_clothes_deleted(id_clothes):
-                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} уже удалена'}
+            if ManageQuery.is_clothes_deleted(id_clothes, id_user):
+                return {'status': 'error', 'message': f'Clothes with ID {id_clothes} have already been removed'}
+
+            if not ManageQuery.get_id_user_by_id(id_user):
+                return {'status': 'error', 'message': f'User with ID {id_user} not found'}
 
             # Выполняем мягкое удаление
             query = """
                 UPDATE photo_clothes
                 SET deleted_at = CURRENT_TIMESTAMP
-                WHERE id_clothes = %s
+                WHERE id_clothes = %s AND id_user = %s
                 RETURNING id_clothes
             """
-            result = ManageQuery._execute_query(query, id_clothes, fetch_insert=True)
+            result = ManageQuery._execute_query(query, (id_clothes, id_user), fetch_insert=True)
 
             # if result and ManageQuery.delete_hash_photos_clothes(id_clothes):
             if result:
                 return {'status': 'success', 'id': result[0]}
-            return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
+            return {'status': 'error', 'message': 'Unable to perform deletion'}
 
         except Error as e:
             logging.error(f"Error delete photo clothes: {str(e)}")
-            return {'status': 'error', 'message': f'Ошибка базы данных: {str(e)}'}
+            return {'status': 'error', 'message': f'Database error: {str(e)}'}
 
     @staticmethod
     def delete_photo_clothes_catalog(id_clothes):  # Мягкое удаление фото одежды из каталога
@@ -598,12 +622,12 @@ class ManageQuery:
 
         try:
             # Проверяем существование записи
-            if not ManageQuery.exist_id_clothes(id_clothes):
-                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} не найдена'}
+            if not ManageQuery.exist_id_clothes_catalog(id_clothes):
+                return {'status': 'error', 'message': f'Clothes with id {id_clothes} not found'}
 
             # Проверяем, не удалена ли уже запись
-            if ManageQuery.is_clothes_deleted(id_clothes):
-                return {'status': 'error', 'message': f'Одежда с ID {id_clothes} уже удалена'}
+            if ManageQuery.is_clothes_deleted_catalog(id_clothes):
+                return {'status': 'error', 'message': f'Clothes with ID {id_clothes} have already been removed'}
 
             # Выполняем мягкое удаление
             query = """
@@ -617,24 +641,39 @@ class ManageQuery:
             # if result and ManageQuery.delete_hash_photos_catalog(id_clothes):
             if result:
                 return {'status': 'success', 'id': result[0]}
-            return {'status': 'error', 'message': 'Не удалось выполнить удаление'}
+            return {'status': 'error', 'message': 'Unable to perform deletion'}
 
         except Error as e:
             logging.error(f"Error delete photo clothes: {str(e)}")
-            return {'status': 'error', 'message': f'Ошибка базы данных: {str(e)}'}
+            return {'status': 'error', 'message': f'Database error: {str(e)}'}
 
     @staticmethod
-    def is_clothes_deleted(id_clothes) -> bool:
+    def is_clothes_deleted(id_clothes, id_user) -> bool:
         """Проверяет, удалена ли уже запись"""
         try:
             query = """
                 SELECT id_clothes FROM photo_clothes
-                WHERE id_clothes = %s AND deleted_at IS NOT NULL
+                WHERE id_clothes = %s AND id_user = %s AND deleted_at IS NOT NULL
+            """
+            result = ManageQuery._execute_query(query, (id_clothes, id_user), fetch=True)
+            return bool(result)
+        except Error as e:
+            logging.error(f"Error in is_clothes_deleted: {str(e)}")
+            return False
+
+    @staticmethod
+    def is_clothes_deleted_catalog(id_clothes):
+        try:
+            query = """
+                SELECT id_clothes FROM photo_clothes
+                WHERE id_clothes = %s 
+                AND deleted_at IS NOT NULL
+                AND id_user IN (SELECT id_user FROM users WHERE is_admin = true)
             """
             result = ManageQuery._execute_query(query, id_clothes, fetch=True)
             return bool(result)
         except Error as e:
-            logging.error(f"Error in is_clothes_deleted: {str(e)}")
+            logging.error(f"Error in is_clothes_deleted_catalog: {str(e)}")
             return False
 
     @staticmethod
@@ -669,20 +708,46 @@ class ManageQuery:
             logging.error(f"Error count user photos {str(e)}")
 
     @staticmethod
-    def exist_id_clothes(id_clothes):
+    def exist_id_clothes(id_clothes, id_user):
+        """
+        Проверяет существование одежды по ID
+        """
         try:
             query = """
                     SELECT id_clothes FROM photo_clothes
-                    WHERE id_clothes = %s AND deleted_at IS NULL
+                    WHERE id_clothes = %s AND id_user = %s AND deleted_at IS NULL
+            """
+            result = ManageQuery._execute_query(query, (id_clothes, id_user), fetch=True)
+            if result:
+                return {
+                    'status': 'success',
+                    'id': result[0][0]
+                }
+            return {'status': 'error', 'message': f'Clothes with ID {id_clothes} not found for user {id_user}'}
+        except Error as e:
+            logging.error(f"Error recovery_photos_wardrobe_db {str(e)}")
+
+    @staticmethod
+    def exist_id_clothes_catalog(id_clothes):
+        """
+        Проверяет только существование одежды в каталоге
+        """
+        try:
+            query = """
+                SELECT id_clothes FROM photo_clothes
+                WHERE id_clothes = %s 
+                AND deleted_at IS NULL
+                AND id_user IN (SELECT id_user FROM users WHERE is_admin = true)
             """
             result = ManageQuery._execute_query(query, id_clothes, fetch=True)
-            if not result:
-                result = None
-            else:
-                result = result[0][0]
-            return result
+            if result:
+                return {
+                    'status': 'success',
+                    'id': result[0][0]
+                }
+            return {'status': 'error', 'message': f'Clothes with ID {id_clothes} not found in catalog'}
         except Error as e:
-            logging.error(f"Error exist id clothes {str(e)}")
+            logging.error(f"Error exist_id_clothes_catalog: {str(e)}")
 
     @staticmethod
     def get_path_clothes(id_clothes):
@@ -866,21 +931,22 @@ class ManageQuery:
     @staticmethod
     def get_deleted_photos_by_type(id_user, photo_type, limit=20, offset=0):
         """
-        Returns a list of deleted photos by type: 'users' or 'clothes'
+        Возвращает список удаленных фотографий по типу: «пользователи» или «одежда»
         """
         try:
             if photo_type == "users":
                 table_name = "photo_users"
+                id_column = "id_photo"
             elif photo_type == "clothes":
                 table_name = "photo_clothes"
+                id_column = "id_clothes"
             else:
                 raise ValueError("Unsupported photo type")
 
             query = f"""
-                SELECT id_photo, photo_path
+                SELECT {id_column}, photo_path
                 FROM {table_name}
                 WHERE id_user = %s AND deleted_at IS NOT NULL   
-                ORDER BY id_photo DESC
                 LIMIT %s OFFSET %s
             """
             result = ManageQuery._execute_query(query, (id_user, limit, offset), fetch=True)
@@ -914,3 +980,20 @@ class ManageQuery:
         except Error as e:
             raise
         return None
+
+    @staticmethod
+    def is_photo_belongs_to_user(id_photo, id_user):
+        """
+        Проверяет, принадлежит ли фото пользователю
+        """
+        try:
+            query = """
+                SELECT id_photo FROM photo_users
+                WHERE id_photo = %s AND id_user = %s AND deleted_at IS NULL
+            """
+            result = ManageQuery._execute_query(query, (id_photo, id_user), fetch=True)
+            return bool(result)
+        except Exception as e:
+            logging.error(f"Error checking photo ownership: {str(e)}")
+            return False
+
