@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from dal.db_query import ManageQuery
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 delete_photos = Blueprint("delete_photos", __name__)
 
 
 @delete_photos.route("/delete/<id_photo>", methods=["DELETE"])
+@jwt_required()
 def delete_photo_user(id_photo):
     """
     Удаляет фото пользователя
@@ -12,28 +14,28 @@ def delete_photo_user(id_photo):
     :return: JSON с результатом операции
     """
     try:
-        ret = None
-
-        result = ManageQuery.delete_photo_user(id_photo)
+        id_user = get_jwt_identity()
+        # Проверяем, принадлежит ли фото пользователю
+        result = ManageQuery.delete_photo_user(id_photo, id_user)
 
         if result["status"] == "success":
-            ret = jsonify({
+            return jsonify({
                 "status": "success",
-                "message": f"Фото пользователя с id {id_photo} успешно удалено",
+                "message": f"User photo with ID {id_photo} successfully removed",
                 "id": result["id"]
             }), 200
 
         elif result["status"] == "error":
-            ret = jsonify({
+            return jsonify({
                 "status": "error",
                 "message": result["message"],
                 "id": id_photo
-            }), 404 if 'не найдена' in result['message'] else 400
+            }), 404 if 'not found' in result['message'] else 400
 
-        return ret
+        return result
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": f"Внутренняя ошибка сервера: {str(e)}",
+            "message": f"Internal Server Error: {str(e)}",
             "id": id_photo
         }), 500

@@ -1,11 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from dal.db_query import ManageQuery
 from bl.utils.check_args import CheckArgs
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 delete_photos = Blueprint("delete_photos", __name__)
 
 
 @delete_photos.route("/wardrobe/delete/<id_clothes>", methods=["DELETE"])
+@jwt_required()
 def delete_photo_clothes(id_clothes):
     """
     Удаляет фото одежды из гардероба пользователя
@@ -13,73 +15,84 @@ def delete_photo_clothes(id_clothes):
     :return: JSON с результатом операции
     """
     try:
-        ret = None
+        id_user = get_jwt_identity()
 
-        result = ManageQuery.delete_photo_clothes(id_clothes)
+        # Проверяем существование записи и принадлежность пользователю
+        if not ManageQuery.exist_id_clothes(id_clothes, id_user):
+            return jsonify({
+                "status": "error",
+                "message": f"Clothes with ID {id_clothes} not found for user",
+                "id": id_clothes
+            }), 404
+
+        result = ManageQuery.delete_photo_clothes(id_clothes, id_user)
 
         if result["status"] == "success":
-            ret = jsonify({
+            return jsonify({
                 "status": "success",
-                "message": f"Фото одежды с id {id_clothes} успешно удалено",
+                "message": f"Photo of clothes with ID {id_clothes} successfully deleted",
                 "id": result["id"]
             }), 200
 
         elif result["status"] == "error":
-            ret = jsonify({
+            return jsonify({
                 "status": "error",
                 "message": result["message"],
                 "id": id_clothes
-            }), 404 if 'не найдена' in result['message'] else 400
+            }), 404 if 'not found' in result['message'] else 400
 
-        return ret
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": f"Внутренняя ошибка сервера: {str(e)}",
+            "message": f"Internal Server Error: {str(e)}",
             "id": id_clothes
         }), 500
 
 
 @delete_photos.route("/catalog/delete/<id_clothes>", methods=["DELETE"])
+@jwt_required()
 def delete_photo_clothes_catalog(id_clothes):
     """
-    Удаляет фото одежды из каталога
+    Удаляет фото одежды из каталога (только для администраторов)
     :param id_clothes: id фото одежды
     :return: JSON с результатом операции
     """
-    user_name = request.args.get("user_name", type=str)
-    if not user_name:
-        return jsonify({
-            "status": "error",
-            "message": "Отсутствует имя пользователя"
-        })
     try:
-        ret = None
+        id_user = get_jwt_identity()
 
-        is_admin = CheckArgs.check_is_admin(user_name)
+        is_admin = CheckArgs.check_is_admin(id_user)
         if is_admin["status"] == "error":
-            return jsonify(is_admin), 403
+            return jsonify({
+                "status": "error",
+                "message": "You do not have permission to delete from the directory."
+            }), 403
+
+        if not ManageQuery.exist_id_clothes_catalog(id_clothes):
+            return jsonify({
+                "status": "error",
+                "message": f"Clothes with ID {id_clothes} not found in the catalog",
+                "id": id_clothes
+            }), 404
 
         result = ManageQuery.delete_photo_clothes_catalog(id_clothes)
 
         if result["status"] == "success":
-            ret = jsonify({
+            return jsonify({
                 "status": "success",
-                "message": f"Фото одежды с id {id_clothes} успешно удалено из каталога",
+                "message": f"The photo of clothes with ID {id_clothes} has been successfully removed from the catalog",
                 "id": result["id"]
             }), 200
 
         elif result["status"] == "error":
-            ret = jsonify({
+            return jsonify({
                 "status": "error",
                 "message": result["message"],
                 "id": id_clothes
-            }), 404 if 'не найдена' in result['message'] else 400
+            }), 404 if 'not found' in result['message'] else 400
 
-        return ret
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": f"Внутренняя ошибка сервера: {str(e)}",
+            "message": f"Internal Server Error: {str(e)}",
             "id": id_clothes
         }), 500
