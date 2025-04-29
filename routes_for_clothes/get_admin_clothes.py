@@ -1,16 +1,28 @@
 from flask import Blueprint, jsonify, request
 from dal.db_query import ManageQuery
 from bl.utils.base64_utils import Base64Utils
+from bl.utils.check_args import CheckArgs
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 get_admin_clothes = Blueprint("get_admin_clothes", __name__)
 
 
 @get_admin_clothes.route("/catalog/admin", methods=["GET"])
+@jwt_required()
 def get_admin_clothes_catalog():
     """
     Возвращает список одежды, добавленной администратором, с поддержкой пагинации.
     """
     try:
+        id_user = get_jwt_identity()
+
+        is_admin = CheckArgs.check_is_admin(id_user)
+        if is_admin["status"] == "error":
+            return jsonify({
+                "status": "error",
+                "message": "You do not have permission to delete from the directory."
+            }), 403
+
         page = request.args.get("page", default=1, type=int)
         limit = request.args.get("limit", default=20, type=int)
 
@@ -22,7 +34,7 @@ def get_admin_clothes_catalog():
         clothes_list = ManageQuery.get_admin_clothes(limit=limit, offset=offset)
 
         if not clothes_list:
-            return jsonify({"error": "Одежда, добавленная администратором, не найдена"}), 404
+            return jsonify({"error": "Clothes added by administrator not found"}), 404
 
         dates = [
             {
@@ -43,4 +55,4 @@ def get_admin_clothes_catalog():
         }), 200
 
     except Exception as error:
-        return jsonify({"error": f"Ошибка при обработке запроса: {str(error)}"}), 500
+        return jsonify({"error": f"Error processing request: {str(error)}"}), 500
