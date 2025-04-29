@@ -65,7 +65,6 @@ def get_data_from_json_add_photos(data):
 
     return photo_base64, category, subcategory, sub_subcategory
 
-
 def get_data_from_json_recovery_photos(data):
     id_clothes = data.get("id_clothes")
     user_name = data.get("user_name")
@@ -133,13 +132,11 @@ def save_photo_to_db(processed_path, file_hash, id_category, id_subcategory, id_
         return None, jsonify({"error": f"Ошибка при работе с БД: {str(e)}"}), 500
 
 
-def validate_and_get_id(source, user_name, category, subcategory, sub_subcategory):
-    id_user = None
+def validate_and_get_id(source, id_user, category, subcategory, sub_subcategory):
     try:
         if source == "wardrobe":
-            id_user = ManageQuery.get_id_user(user_name)
             if id_user is None:
-                return {"error": f"user_name '{user_name}' не найден"}, 404
+                return {"error": f"User not found"}, 404
 
         id_category = ManageQuery.get_id_category_clothes(category)
         if id_category is None:
@@ -190,11 +187,11 @@ def fetch_clothes(source, id_user, id_category, id_subcategory, id_sub_subcatego
         raise
 
 
-def get_clothes_by_type(source, user_name, category, subcategory, sub_subcategory, page, limit):
+def get_clothes_by_type(source, id_user, category, subcategory, sub_subcategory, page, limit):
     try:
         offset = (page - 1) * limit
 
-        id_result, status_code = validate_and_get_id(source, user_name, category, subcategory, sub_subcategory)
+        id_result, status_code = validate_and_get_id(source, id_user, category, subcategory, sub_subcategory)
 
         if status_code != 200:
             return id_result, status_code
