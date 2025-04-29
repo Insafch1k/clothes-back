@@ -173,7 +173,8 @@ class CheckArgs:
 
     @staticmethod
     def check_is_admin(id_user):
-        if str(id_user not in os.getenv('ADMIN_LIST')):
+        admin_list = os.getenv('ADMIN_LIST', '').split(',')
+        if str(id_user) not in admin_list:
             return {
                 "status": "error",
                 "error": "Пользователь не является администратором"
