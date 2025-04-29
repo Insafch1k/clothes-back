@@ -33,8 +33,6 @@ def process_clothes():
         if result["status"] == "error":
             return jsonify(result), 400
 
-        # result["id_user"] = id_user
-
         # Проверка уникальности
         decode_image = Base64Utils.decode_base64_in_image(photo_base64)
         file_hash = calculate_hash(decode_image)
@@ -86,7 +84,7 @@ def add_photos_in_catalog():
             request.json)
 
         # Проверка необходимых данных
-        result = CheckArgs.check_args_add_photo_clothes(photo_base64, category, subcategory,
+        result = CheckArgs.check_args_add_photo_clothes(id_user, photo_base64, category, subcategory,
                                                         sub_subcategory)
         if result["status"] == "error":
             return jsonify(result), 400

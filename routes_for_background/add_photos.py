@@ -1,11 +1,12 @@
-from flask import Blueprint, request, jsonify, send_from_directory
-import os
+from flask import Blueprint, request, jsonify
 from bl.utils.base64_utils import Base64Utils
 from bl.background_bl.background_bl import remove_background
 from bl.utils.create_folders import create_folders_for_background
 from bl.utils.hash import calculate_hash
-from config import PROCESSED_FOLDER_BACKGROUND
+import config
 from dal.db_query import ManageQuery
+from flask_jwt_extended import jwt_required, get_jwt_identity
+import bl.background_bl.background_bl as background_bl
 
 add_photos = Blueprint("add_photos", __name__)
 
@@ -13,36 +14,27 @@ create_folders_for_background()
 
 
 @add_photos.route("/process", methods=["POST"])
+@jwt_required()
 def upload_file():
     """
     Принимает изображение в формате base64, удаляет фон и возвращает Base64-изображение без фона.
     """
-    # Получаем данные из JSON
-    data = request.json
-    user_name = data.get("user_name")
-    photo_base64 = data.get("image")
-
-    # Проверка необходимых данных
-    if not user_name:
-        return jsonify({"error": "Отсутствует параметр user_name"}), 400
-    if not photo_base64:
-        return jsonify({"error": "Отсутствует параметр photo (base64)"}), 400
-    id_user = ManageQuery.get_id_user(user_name)
-    if not id_user:
-        return jsonify({
-            "error": f"Пользователь с именем {user_name} не найден"
-        }), 400
-
     try:
-        # Декодируем base64
-        decode_image = Base64Utils.decode_base64_in_image(photo_base64)
+        # Получаем текущего пользователя из JWT
+        id_user = get_jwt_identity()
 
-        # Проверяем уникальность по хэшу
+        # Получаем данные из JSON
+        photo_base64 = request.json.get("image")
+        if not photo_base64:
+            return jsonify({"error": "Missing parameter photo (base64)"}), 400
+
+        # Проверка уникальности
+        decode_image = Base64Utils.decode_base64_in_image(photo_base64)
         file_hash = calculate_hash(decode_image)
         if not ManageQuery.is_photo_users_unique(file_hash, id_user):
             return jsonify({"error": "Photo already exists"}), 400
 
-        # Проверяем, есть ли уже такое фото у пользователя среди удалённых, если есть, то восстанавливаем его
+        # Проверяем, есть ли уже такое фото у пользователя среди удалённых
         id_photo = ManageQuery.is_photo_user_among_deleted(file_hash, id_user)
         if id_photo:
             result = ManageQuery.recovery_photos_human_db(id_photo, id_user)
@@ -51,43 +43,30 @@ def upload_file():
             else:
                 return jsonify(result), 200
 
-        # Генерируем уникальное имя файла.
-        # Декодируем base64 и сохраняем изображение
-        try:
-            input_path = Base64Utils.writing_file_background(photo_base64)
-        except Exception as e:
-            return jsonify({"error": f"Failed to save image: {str(e)}"}), 500
+        # Обработка фото
+        processed_path, file_hash, error_response, status_code = background_bl.process_photo_common(
+            photo_base64,
+            Base64Utils.writing_file_background,
+            remove_background,
+            config.PROCESSED_FOLDER_BACKGROUND
+        )
+        if error_response:
+            return error_response, status_code
 
-        # Удаляем фон
-        output_filename = remove_background(input_path)
+        # Сохранение в БД
+        encode_image, error_response, status_code = background_bl.save_photo_to_db(
+            processed_path,
+            file_hash,
+            id_user,
+            ManageQuery.add_hash_photos_users
+        )
+        if error_response:
+            return error_response, status_code
 
-        # Удаляем необработанное фото
-        if os.path.exists(input_path):
-            os.remove(input_path)
-
-        if output_filename:
-            # Путь к обработанному изображению
-            processed_path = os.path.join(PROCESSED_FOLDER_BACKGROUND, output_filename)
-
-            # Сохраняем информацию о фотографии пользователя
-            try:
-                id_photo = ManageQuery.add_photo_user(user_name=user_name, photo_path=processed_path, category="full",
-                                                      is_cut=True)
-
-                if id_photo:
-                    ManageQuery.add_hash_photos_users(id_photo, file_hash)
-                    encode_image = Base64Utils.encode_to_base64(processed_path)
-
-                    return jsonify({
-                        "status": "success",
-                        "message": "Фон успешно удален",
-                        "image_base64": f"data:image/png;base64,{encode_image}"
-                    })
-                else:
-                    return jsonify({"error": "Ошибка сохранения данных в БД"}), 500
-            except Exception as db_error:
-                return jsonify({"error": f"Ошибка при работе с БД: {str(db_error)}"}), 500
-        else:
-            return jsonify({"error": "Ошибка обработки изображения"}), 500
+        return jsonify({
+            "status": "success",
+            "message": "Background successfully removed",
+            "image_base64": f"data:image/png;base64,{encode_image}"
+        })
     except Exception as error:
-        return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
+        return jsonify({"error": f"Error processing request: {str(error)}"}), 500
