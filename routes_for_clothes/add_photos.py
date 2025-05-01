@@ -71,6 +71,7 @@ def process_clothes():
 
 
 @add_photos.route("/catalog/add_photos", methods=["POST"])
+@jwt_required()
 def add_photos_in_catalog():
     """
     Добавление фото в каталог администратором
