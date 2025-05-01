@@ -69,8 +69,8 @@ def process_clothes():
     except Exception as error:
         return jsonify({"error": f"Ошибка обработки запроса: {str(error)}"}), 500
 
-
 @add_photos.route("/catalog/add_photos", methods=["POST"])
+@jwt_required()
 def add_photos_in_catalog():
     """
     Добавление фото в каталог администратором
